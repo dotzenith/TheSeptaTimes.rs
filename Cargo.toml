@@ -1,0 +1,15 @@
+[package]
+name = "the_septa_times"
+version = "0.1.0"
+edition = "2021"
+autobins = false
+
+[[bin]]
+name = "tst"
+path = "src/main.rs"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+serde = { version = "1.0.188", features = ["derive"] }
+reqwest = { version = "0.11.20", features = ["blocking", "json"] }
