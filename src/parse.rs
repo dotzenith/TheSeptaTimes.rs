@@ -10,7 +10,17 @@ pub trait Parse {
 
 impl Parse for NextToArriveResult {
     fn parse(&self) -> Vec<String> {
-        println!("{:?}", self);
-        vec!["Hmmmm".to_owned()]
+        let mut results: Vec<String> = Vec::new();
+        for train in self.iter() {
+            results.push(format!(
+                "{:<11}{:<13}{:<11}{:<9}{}",
+                train["orig_train"].as_ref().unwrap(),
+                train["orig_departure_time"].as_ref().unwrap(),
+                train["orig_arrival_time"].as_ref().unwrap(),
+                train["orig_delay"].as_ref().unwrap(),
+                train["orig_line"].as_ref().unwrap()
+            ));
+        }
+        results
     }
 }
