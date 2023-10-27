@@ -15,25 +15,25 @@ impl SeptaApi {
         &self,
         from: &str,
         to: &str,
-        num: Option<u8>,
+        num: u8,
     ) -> Result<NextToArriveResult, Box<dyn Error>> {
         let request_url = format!(
             "{}/NextToArrive/index.php?req1={}&req2={}&req3={}",
             self.base_url,
             from,
             to,
-            num.unwrap_or(5)
+            num,
         );
         let result = NextToArriveResult(get(request_url)?.json()?);
         Ok(result)
     }
 
-    pub fn arrivals(&self, name: &str, num: Option<u8>) -> Result<ArrivalResult, Box<dyn Error>> {
+    pub fn arrivals(&self, name: &str, num: u8) -> Result<ArrivalResult, Box<dyn Error>> {
         let request_url = format!(
             "{}/Arrivals/index.php?station={}&results={}",
             self.base_url,
             name,
-            num.unwrap_or(5)
+            num,
         );
         let result = ArrivalResult(get(request_url)?.json()?);
         Ok(result)
