@@ -35,11 +35,11 @@ impl Parse for Arrival {
                 format!(
                     "{:<13}{:<11}{:<27}{:<12}{:<10}{}",
                     "North",
-                    train["train_id"].as_deref().unwrap_or("balls"),
-                    train["next_station"].as_deref().unwrap_or("balls"),
+                    train["train_id"].as_deref().unwrap_or("None"),
+                    train["next_station"].as_deref().unwrap_or("None"),
                     parse_time(train["sched_time"].as_deref()),
-                    train["status"].as_deref().unwrap_or("balls"),
-                    train["destination"].as_deref().unwrap_or("balls")
+                    train["status"].as_deref().unwrap_or("None"),
+                    train["destination"].as_deref().unwrap_or("None")
                 )
             })
             .collect();
@@ -50,11 +50,11 @@ impl Parse for Arrival {
                 format!(
                     "{:<13}{:<11}{:<27}{:<12}{:<10}{}",
                     "South",
-                    train["train_id"].as_deref().unwrap_or("balls"),
-                    train["next_station"].as_deref().unwrap_or("balls"),
+                    train["train_id"].as_deref().unwrap_or("None"),
+                    train["next_station"].as_deref().unwrap_or("None"),
                     parse_time(train["sched_time"].as_deref()),
-                    train["status"].as_deref().unwrap_or("balls"),
-                    train["destination"].as_deref().unwrap_or("balls")
+                    train["status"].as_deref().unwrap_or("None"),
+                    train["destination"].as_deref().unwrap_or("None")
                 )
             })
             .collect::<Vec<String>>()
@@ -70,11 +70,11 @@ impl Parse for NextToArrive {
             .map(|train| {
                 format!(
                     "{:<11}{:<13}{:<11}{:<9}{}",
-                    train["orig_train"].as_deref().unwrap_or("balls"),
-                    train["orig_departure_time"].as_deref().unwrap_or("balls"),
-                    train["orig_arrival_time"].as_deref().unwrap_or("balls"),
-                    train["orig_delay"].as_deref().unwrap_or("balls"),
-                    train["orig_line"].as_deref().unwrap_or("balls")
+                    train["orig_train"].as_deref().unwrap_or("None"),
+                    train["orig_departure_time"].as_deref().unwrap_or("None"),
+                    train["orig_arrival_time"].as_deref().unwrap_or("None"),
+                    train["orig_delay"].as_deref().unwrap_or("None"),
+                    train["orig_line"].as_deref().unwrap_or("None")
                 )
             })
             .collect()
@@ -88,9 +88,9 @@ impl Parse for TrainSchedule {
             .map(|train| {
                 format!(
                     "{:<27}{:<18}{}",
-                    train["station"].as_deref().unwrap_or("balls"),
-                    train["sched_tm"].as_deref().unwrap_or("balls"),
-                    train["act_tm"].as_deref().unwrap_or("balls")
+                    train["station"].as_deref().unwrap_or("None"),
+                    train["sched_tm"].as_deref().unwrap_or("None"),
+                    train["act_tm"].as_deref().unwrap_or("None")
                 )
             })
             .collect()
