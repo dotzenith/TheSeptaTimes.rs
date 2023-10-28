@@ -1,15 +1,17 @@
 mod api;
 mod parse;
-mod stations;
+mod data;
+mod print;
 
-use crate::api::SeptaApi;
-use crate::parse::Parse;
+use crate::data::{Arrival, NextToArrive, TrainSchedule, Stations};
+use crate::print::Print;
 use std::env;
 
 fn main() {
-    let api = SeptaApi::new();
     let argv: Vec<String> = env::args().skip(1).collect();
     let str_argv: Vec<&str> = argv.iter().map(String::as_str).collect();
+
+    let stations = Stations::new();
 
     match str_argv.as_slice() {
         ["-h" | "--help", ..] => {
@@ -19,40 +21,47 @@ fn main() {
                 Commands:\n  \
                   arrivals  Find the next arrivals at a given train station\n  \
                   next      Search for the next train going from an origin to a destination\n  \
-                  search    Search for a given station\n  \
+                  stations  Get all valid station names\n  \
                   train     Track a given train using it's number\n");
             std::process::exit(0);
         },
         ["arrivals", station] => {
-            for arrival in api.arrivals(station, 5).unwrap().parse().iter() {
-                println!("{arrival}");
+            if !stations.exists(station) {
+                eprintln!("Invalid station, please use `tst stations` for all valid station names");
+                std::process::exit(1);
             }
-            std::process::exit(0);
+            Arrival::print(Arrival::get(station, 5));
         },
         ["arrivals", station, num] => {
-            for arrival in api.arrivals(station, num.parse::<u8>().unwrap_or(5)).unwrap().parse().iter() {
-                println!("{arrival}");
+            if !stations.exists(station) {
+                eprintln!("Invalid station, please use `tst stations` for all valid station names");
+                std::process::exit(1);
             }
-            std::process::exit(0);
+            Arrival::print(Arrival::get(station, num.parse::<u8>().unwrap_or(5)));
         },
         ["next", start, end] => {
-            for arrival in api.next_to_arrive(start, end, 5).unwrap().parse().iter() {
-                println!("{arrival}");
+            if !stations.exists(start) || !stations.exists(end) {
+                eprintln!("Invalid station, please use `tst stations` for all valid station names");
+                std::process::exit(1);
             }
-            std::process::exit(0);
+            NextToArrive::print(NextToArrive::get(start, end, 5));
         },
         ["next", start, end, num] => {
-            for arrival in api.next_to_arrive(start, end, num.parse::<u8>().unwrap_or(5)).unwrap().parse().iter() {
-                println!("{arrival}");
+            if !stations.exists(start) || !stations.exists(end) {
+                eprintln!("Invalid station, please use `tst stations` for all valid station names");
+                std::process::exit(1);
             }
-            std::process::exit(0);
+            NextToArrive::print(NextToArrive::get(start, end, num.parse::<u8>().unwrap_or(5)));
         },
         ["train", train_num] => {
-            for arrival in api.train_schedule(train_num).unwrap().parse().iter() {
-                println!("{arrival}");
+            TrainSchedule::print(TrainSchedule::get(train_num));
+        },
+        ["stations"] => {
+            for station in stations.stations().iter() {
+                println!("{station}");
             }
             std::process::exit(0);
-        },
+        }
         [..] => {
             println!("Invalid command: use --help or -h for usage details");
             std::process::exit(1);

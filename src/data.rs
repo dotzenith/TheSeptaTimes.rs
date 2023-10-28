@@ -1,25 +1,55 @@
-pub const STATIONS: [&'static str; 154] = [
+use std::collections::HashMap;
+
+pub struct NextToArrive(pub Vec<HashMap<String, Option<String>>>);
+pub struct Arrival(
+    pub HashMap<String, Vec<HashMap<String, Vec<HashMap<String, Option<String>>>>>>,
+);
+pub struct TrainSchedule(pub Vec<HashMap<String, Option<String>>>);
+
+pub struct Stations {
+    stations: [&'static str; 154]
+}
+
+impl Stations {
+    pub fn new() -> Self {
+        Stations {
+            stations: STATIONS
+        }
+    }
+
+    pub fn stations(&self) -> &[&'static str; 154] {
+        &self.stations
+    }
+
+    pub fn exists(&self, entry: &str) -> bool {
+        self.stations.contains(&entry)
+    }
+}
+
+pub const URL: &str = "https://www3.septa.org/api";
+
+const STATIONS: [&'static str; 154] = [
     "9th St",
+    "30th Street Station",
+    "49th St",
+    "Airport Terminal A",
+    "airport terminal B",
+    "airport terminal C-D",
+    "airport terminal E-F",
+    "Allegheny",
+    "Allen Lane",
+    "Ambler",
+    "Angora",
+    "Ardmore",
+    "Ardsley",
+    "Aala",
+    "Aerwyn",
+    "Aethayres",
+    "Aridesburg",
+    "Aristol",
+    "Bryn Mawr",
+    "Carpenter",
     "Chalfont",
-    "30th street station",
-    "49th st",
-    "airport terminal a",
-    "airport terminal b",
-    "airport terminal c-d",
-    "airport terminal e-f",
-    "allegheny",
-    "allen lane",
-    "ambler",
-    "angora",
-    "ardmore",
-    "ardsley",
-    "bala",
-    "berwyn",
-    "bethayres",
-    "bridesburg",
-    "bristol",
-    "bryn mawr",
-    "carpenter",
     "Chelten Avenue",
     "Cheltenham",
     "Chester TC",

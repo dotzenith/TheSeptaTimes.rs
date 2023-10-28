@@ -1,10 +1,4 @@
-use std::collections::HashMap;
-
-pub struct NextToArriveResult(pub Vec<HashMap<String, Option<String>>>);
-pub struct ArrivalResult(
-    pub HashMap<String, Vec<HashMap<String, Vec<HashMap<String, Option<String>>>>>>,
-);
-pub struct TrainScheduleResult(pub Vec<HashMap<String, Option<String>>>);
+use crate::data::{Arrival, NextToArrive, TrainSchedule};
 
 pub fn parse_time(time: Option<&str>) -> String {
     if time.is_none() {
@@ -29,25 +23,7 @@ pub trait Parse {
     fn parse(&self) -> Vec<String>;
 }
 
-impl Parse for NextToArriveResult {
-    fn parse(&self) -> Vec<String> {
-        self.0
-            .iter()
-            .map(|train| {
-                format!(
-                    "{:<11}{:<13}{:<11}{:<9}{}",
-                    train["orig_train"].as_deref().unwrap_or("balls"),
-                    train["orig_departure_time"].as_deref().unwrap_or("balls"),
-                    train["orig_arrival_time"].as_deref().unwrap_or("balls"),
-                    train["orig_delay"].as_deref().unwrap_or("balls"),
-                    train["orig_line"].as_deref().unwrap_or("balls")
-                )
-            })
-            .collect()
-    }
-}
-
-impl Parse for ArrivalResult {
+impl Parse for Arrival {
     fn parse(&self) -> Vec<String> {
         let vec = self.0.values().next().unwrap();
         let north = &vec[0]["Northbound"];
@@ -87,7 +63,25 @@ impl Parse for ArrivalResult {
     }
 }
 
-impl Parse for TrainScheduleResult {
+impl Parse for NextToArrive {
+    fn parse(&self) -> Vec<String> {
+        self.0
+            .iter()
+            .map(|train| {
+                format!(
+                    "{:<11}{:<13}{:<11}{:<9}{}",
+                    train["orig_train"].as_deref().unwrap_or("balls"),
+                    train["orig_departure_time"].as_deref().unwrap_or("balls"),
+                    train["orig_arrival_time"].as_deref().unwrap_or("balls"),
+                    train["orig_delay"].as_deref().unwrap_or("balls"),
+                    train["orig_line"].as_deref().unwrap_or("balls")
+                )
+            })
+            .collect()
+    }
+}
+
+impl Parse for TrainSchedule {
     fn parse(&self) -> Vec<String> {
         self.0
             .iter()
