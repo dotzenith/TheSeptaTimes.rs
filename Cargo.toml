@@ -1,7 +1,10 @@
 [package]
-name = "the_septa_times"
+name = "the-septa-times"
 version = "0.1.0"
 edition = "2021"
+description = "A CLI application for the SEPTA API"
+repository = "https://github.com/dotzenith/TheSeptaTimes.rs"
+license = "MIT"
 autobins = false
 
 [[bin]]
