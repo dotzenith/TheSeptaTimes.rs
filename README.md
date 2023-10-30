@@ -88,6 +88,22 @@ tst train 9374
 tst stations
 ```
 
+### ❖ Advanced Usage
+
+Since `tst` requires the "correct" station names, it can often be a little cumbersome. This can be alleviated with the power of pipes and [rg](https://github.com/BurntSushi/ripgrep) (or grep)
+
+```bash
+#!/usr/bin/env bash
+tst next "$(tst stations | rg -i $1 | head -1)" "$(tst stations | rg -i $2 | head -1)" $3
+```
+
+Now you can call the script like so:
+```
+next "30th" "villa" 5       # The same as: tst next "30th Street Station" "Villanova" 5
+```
+
+The script above can be easily adapted for `tst arrivals` as well
+
 ---
 
 ### ❖ What's New? 
