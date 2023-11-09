@@ -1,17 +1,16 @@
-use std::error::Error;
-
 use crate::data::{Arrival, NextToArrive, TrainSchedule};
 use crate::parse::Parse;
+use anyhow::Result;
 use colored::Colorize;
 
 pub trait Print {
-    fn print(result: Result<Self, Box<dyn Error>>)
+    fn print(result: Result<Self>)
     where
         Self: Sized;
 }
 
 impl Print for Arrival {
-    fn print(result: Result<Self, Box<dyn Error>>) {
+    fn print(result: Result<Self>) {
         match result {
             Ok(arrival) => {
                 println!(
@@ -37,7 +36,7 @@ impl Print for Arrival {
 }
 
 impl Print for NextToArrive {
-    fn print(result: Result<Self, Box<dyn Error>>) {
+    fn print(result: Result<Self>) {
         match result {
             Ok(next_to_arrive) => {
                 println!(
@@ -62,7 +61,7 @@ impl Print for NextToArrive {
 }
 
 impl Print for TrainSchedule {
-    fn print(result: Result<Self, Box<dyn Error>>) {
+    fn print(result: Result<Self>) {
         match result {
             Ok(train_schedule) => {
                 println!(
