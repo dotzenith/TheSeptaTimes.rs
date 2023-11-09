@@ -33,23 +33,23 @@ impl Stations {
     }
 
     pub fn refresh() -> Result<()> {
-        let station = Self::fetch_stations("http://www3.septa.org/VIRegionalRail.html")?;
-        Self::save(&station)?;
+        let station = Self::fetch_stations_from_url("http://www3.septa.org/VIRegionalRail.html")?;
+        Self::save_stations(&station)?;
         Ok(())
     }
 
     fn get_stations() -> Result<Vec<String>> {
-        match Self::read() {
+        match Self::read_stations_from_file() {
             Ok(stations) => Ok(stations),
             Err(_) => {
-                let station = Self::fetch_stations("http://www3.septa.org/VIRegionalRail.html")?;
-                Self::save(&station)?;
+                let station = Self::fetch_stations_from_url("http://www3.septa.org/VIRegionalRail.html")?;
+                Self::save_stations(&station)?;
                 Ok(station)
             }
         }
     }
 
-    fn fetch_stations(url: &str) -> Result<Vec<String>> {
+    fn fetch_stations_from_url(url: &str) -> Result<Vec<String>> {
         let response = reqwest::blocking::get(url);
         let html_content = Html::parse_document(&response?.text()?);
         let selector = Selector::parse("table > tbody > tr > td").unwrap();
@@ -63,7 +63,7 @@ impl Stations {
         Ok(stations)
     }
 
-    fn save(stations: &Vec<String>) -> Result<()> {
+    fn save_stations(stations: &Vec<String>) -> Result<()> {
         let app_dirs = AppDirs::new(Some("TheSeptaTimes"), true).context("Unable to get AppDirs")?;
         if !app_dirs.cache_dir.exists() {
             create_dir(&app_dirs.cache_dir)?;
@@ -81,7 +81,7 @@ impl Stations {
         Ok(())
     }
 
-    fn read() -> Result<Vec<String>> {
+    fn read_stations_from_file() -> Result<Vec<String>> {
         let app_dirs = AppDirs::new(Some("TheSeptaTimes"), true).context("Unable to get AppDirs")?;
 
         let mut f = BufReader::new(
