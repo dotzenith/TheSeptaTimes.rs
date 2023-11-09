@@ -5,9 +5,7 @@ pub fn parse_time(time: Option<&str>) -> String {
         return "None".to_owned();
     }
 
-    let time_vec: Vec<&str> = time.unwrap().split(" ").collect::<Vec<&str>>()[1]
-        .split(":")
-        .collect();
+    let time_vec: Vec<&str> = time.unwrap().split(" ").collect::<Vec<&str>>()[1].split(":").collect();
     let mut hour = time_vec[0].parse::<u8>().unwrap_or(0);
     let minute = time_vec[1].parse::<u8>().unwrap_or(0);
     let mut meridian = "AM";
@@ -45,19 +43,20 @@ impl Parse for Arrival {
             .collect();
 
         trains.append(
-            &mut south.into_iter()
-            .map(|train| {
-                format!(
-                    "{:<13}{:<11}{:<27}{:<12}{:<10}{}",
-                    "South",
-                    train["train_id"].as_deref().unwrap_or("None"),
-                    train["next_station"].as_deref().unwrap_or("None"),
-                    parse_time(train["sched_time"].as_deref()),
-                    train["status"].as_deref().unwrap_or("None"),
-                    train["destination"].as_deref().unwrap_or("None")
-                )
-            })
-            .collect::<Vec<String>>()
+            &mut south
+                .into_iter()
+                .map(|train| {
+                    format!(
+                        "{:<13}{:<11}{:<27}{:<12}{:<10}{}",
+                        "South",
+                        train["train_id"].as_deref().unwrap_or("None"),
+                        train["next_station"].as_deref().unwrap_or("None"),
+                        parse_time(train["sched_time"].as_deref()),
+                        train["status"].as_deref().unwrap_or("None"),
+                        train["destination"].as_deref().unwrap_or("None")
+                    )
+                })
+                .collect::<Vec<String>>(),
         );
         trains
     }

@@ -1,29 +1,25 @@
-use std::collections::HashMap;
 use anyhow::{Context, Result};
 use bincode::{deserialize_from, serialize_into};
 use platform_dirs::AppDirs;
 use scraper::{Html, Selector};
+use std::collections::HashMap;
 use std::fs::{create_dir, OpenOptions};
 use std::io::{BufReader, BufWriter};
 
 pub struct NextToArrive(pub Vec<HashMap<String, Option<String>>>);
-pub struct Arrival(
-    pub HashMap<String, Vec<HashMap<String, Vec<HashMap<String, Option<String>>>>>>,
-);
+pub struct Arrival(pub HashMap<String, Vec<HashMap<String, Vec<HashMap<String, Option<String>>>>>>);
 pub struct TrainSchedule(pub Vec<HashMap<String, Option<String>>>);
 
 pub struct Stations {
-    stations: Vec<String>
+    stations: Vec<String>,
 }
 
 impl Stations {
     pub fn new() -> Self {
-        let mut stations = Stations {
-            stations: Vec::new()
-        };
+        let mut stations = Stations { stations: Vec::new() };
         stations.stations = match Self::get_stations() {
             Ok(stations) => stations,
-            Err(_) => FALLBACK_STATIONS.into_iter().map(|str| str.to_string()).collect()
+            Err(_) => FALLBACK_STATIONS.into_iter().map(|str| str.to_string()).collect(),
         };
         stations
     }
@@ -36,7 +32,7 @@ impl Stations {
         self.stations.contains(&entry.to_string())
     }
 
-    pub fn refresh() ->Result<()> {
+    pub fn refresh() -> Result<()> {
         let station = Self::fetch_stations("http://www3.septa.org/VIRegionalRail.html")?;
         Self::save(&station)?;
         Ok(())
@@ -49,7 +45,7 @@ impl Stations {
                 let station = Self::fetch_stations("http://www3.septa.org/VIRegionalRail.html")?;
                 Self::save(&station)?;
                 Ok(station)
-            },
+            }
         }
     }
 
