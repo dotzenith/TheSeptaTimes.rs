@@ -27,39 +27,47 @@ fn main() {
                   refresh   Refresh the cache for station names\n"
             );
         }
-        ["arrivals", station] => {
-            if !stations.exists(station) {
+        ["arrivals", station] => match stations.fuzzy_search(station) {
+            Ok(matching_station) => Arrival::print(Arrival::get(matching_station, 5)),
+            Err(_) => {
                 eprintln!("Invalid station, please use `tst stations` for all valid station names");
-                std::process::exit(1);
+                std::process::exit(1)
             }
-            Arrival::print(Arrival::get(station, 5));
-        }
-        ["arrivals", station, num] => {
-            if !stations.exists(station) {
+        },
+        ["arrivals", station, num] => match stations.fuzzy_search(station) {
+            Ok(matching_station) => Arrival::print(Arrival::get(matching_station, num.parse::<u8>().unwrap_or(5))),
+            Err(_) => {
                 eprintln!("Invalid station, please use `tst stations` for all valid station names");
-                std::process::exit(1);
+                std::process::exit(1)
             }
-            Arrival::print(Arrival::get(station, num.parse::<u8>().unwrap_or(5)));
-        }
-        ["next", start, end] => {
-            if !stations.exists(start) || !stations.exists(end) {
+        },
+        ["next", start, end] => match (stations.fuzzy_search(start), stations.fuzzy_search(end)) {
+            (Err(_), _) | (_, Err(_)) => {
                 eprintln!("Invalid station, please use `tst stations` for all valid station names");
-                std::process::exit(1);
+                std::process::exit(1)
             }
-            NextToArrive::print(NextToArrive::get(start, end, 5));
-        }
-        ["next", start, end, num] => {
-            if !stations.exists(start) || !stations.exists(end) {
+            (Ok(matching_start), Ok(matching_end)) => {
+                NextToArrive::print(NextToArrive::get(matching_start, matching_end, 5));
+            }
+        },
+        ["next", start, end, num] => match (stations.fuzzy_search(start), stations.fuzzy_search(end)) {
+            (Err(_), _) | (_, Err(_)) => {
                 eprintln!("Invalid station, please use `tst stations` for all valid station names");
-                std::process::exit(1);
+                std::process::exit(1)
             }
-            NextToArrive::print(NextToArrive::get(start, end, num.parse::<u8>().unwrap_or(5)));
-        }
+            (Ok(matching_start), Ok(matching_end)) => {
+                NextToArrive::print(NextToArrive::get(
+                    matching_start,
+                    matching_end,
+                    num.parse::<u8>().unwrap_or(5),
+                ));
+            }
+        },
         ["train", train_num] => {
             TrainSchedule::print(TrainSchedule::get(train_num));
         }
         ["stations"] => {
-            for station in stations.stations().iter() {
+            for station in stations.get_stations().iter() {
                 println!("{station}");
             }
         }

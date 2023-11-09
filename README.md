@@ -69,51 +69,40 @@ Commands:
   refresh   Refresh the cache for station names
 ```
 
-> Get times for the next two trains that go from a given train station to another
+#### Get times for the next two trains that go from a given train station to another:
 ```sh
 tst next '30th Street Station' 'North Philadelphia'
 ```
 
-> List the next 6 arrivals at a given train station
+#### Since `tst` uses fuzzy matching, you can also do:
+```sh
+tst next 'suburban' '30th'
+```
+
+#### List the next 6 arrivals at a given train station:
 ```sh
 tst arrivals '30th Street Station' 6
 ```
 
-> Take a look at any given train's schedule using the train number
+#### Take a look at any given train's schedule using the train number:
 ```sh
 tst train 9374
 ```
 
-> Get all valid train station names
+#### Get all valid train station names:
 ```sh
 tst stations
 ```
 
-> Refresh the cache for station names
+#### Refresh the cache for station names:
 ```sh
 tst refresh
 ```
 
-### ❖ Advanced Usage
-
-Since `tst` requires the "correct" station names, it can often be a little cumbersome. This can be alleviated with the power of pipes and [rg](https://github.com/BurntSushi/ripgrep) (or grep)
-
-```bash
-#!/usr/bin/env bash
-tst next "$(tst stations | rg -i $1 | head -1)" "$(tst stations | rg -i $2 | head -1)" $3
-```
-
-Now you can call the script like so:
-```
-next "30th" "villa" 5       # The same as: tst next "30th Street Station" "Villanova" 5
-```
-
-The script above can be easily adapted for `tst arrivals` as well
-
 ---
 
 ### ❖ What's New? 
-0.1.2 - Initial release
+0.3.0 - Add fuzzy matching for stations
 
 ---
 

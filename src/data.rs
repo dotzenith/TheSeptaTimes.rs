@@ -1,5 +1,7 @@
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use bincode::{deserialize_from, serialize_into};
+use fuzzy_matcher::skim::SkimMatcherV2;
+use fuzzy_matcher::FuzzyMatcher;
 use platform_dirs::AppDirs;
 use scraper::{Html, Selector};
 use std::collections::HashMap;
@@ -12,38 +14,57 @@ pub struct TrainSchedule(pub Vec<HashMap<String, Option<String>>>);
 
 pub struct Stations {
     stations: Vec<String>,
+    matcher: SkimMatcherV2,
 }
 
 impl Stations {
     pub fn new() -> Self {
-        let mut stations = Stations { stations: Vec::new() };
-        stations.stations = match Self::get_stations() {
+        let mut stations = Stations {
+            stations: Vec::new(),
+            matcher: SkimMatcherV2::default(),
+        };
+        stations.stations = match Self::get_stations_from_file_or_url() {
             Ok(stations) => stations,
             Err(_) => FALLBACK_STATIONS.into_iter().map(|str| str.to_string()).collect(),
         };
         stations
     }
 
-    pub fn stations(&self) -> &Vec<String> {
+    pub fn get_stations(&self) -> &Vec<String> {
         &self.stations
-    }
-
-    pub fn exists(&self, entry: &str) -> bool {
-        self.stations.contains(&entry.to_string())
     }
 
     pub fn refresh() -> Result<()> {
         let station = Self::fetch_stations_from_url("http://www3.septa.org/VIRegionalRail.html")?;
-        Self::save_stations(&station)?;
+        Self::save_stations_to_file(&station)?;
         Ok(())
     }
 
-    fn get_stations() -> Result<Vec<String>> {
+    pub fn fuzzy_search(&self, search: &str) -> Result<&str> {
+        let results: Vec<i64> = self
+            .stations
+            .iter()
+            .map(|station| self.matcher.fuzzy_match(station, search).unwrap_or(0))
+            .collect();
+
+        if results.iter().sum::<i64>() == 0 {
+            return Err(anyhow!("No matching value"));
+        }
+
+        Ok(&self.stations[results
+            .iter()
+            .enumerate()
+            .max_by(|(_, a), (_, b)| a.cmp(b))
+            .map(|(index, _)| index)
+            .context("Could not get the index of matching value")?])
+    }
+
+    fn get_stations_from_file_or_url() -> Result<Vec<String>> {
         match Self::read_stations_from_file() {
             Ok(stations) => Ok(stations),
             Err(_) => {
                 let station = Self::fetch_stations_from_url("http://www3.septa.org/VIRegionalRail.html")?;
-                Self::save_stations(&station)?;
+                Self::save_stations_to_file(&station)?;
                 Ok(station)
             }
         }
@@ -63,7 +84,7 @@ impl Stations {
         Ok(stations)
     }
 
-    fn save_stations(stations: &Vec<String>) -> Result<()> {
+    fn save_stations_to_file(stations: &Vec<String>) -> Result<()> {
         let app_dirs = AppDirs::new(Some("TheSeptaTimes"), true).context("Unable to get AppDirs")?;
         if !app_dirs.cache_dir.exists() {
             create_dir(&app_dirs.cache_dir)?;
