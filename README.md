@@ -55,7 +55,7 @@ cargo build --release
 
 ### ❖ Usage
 
-```sh
+```
 Usage: tst [OPTIONS] COMMAND [ARGS]...
 
 Options:
