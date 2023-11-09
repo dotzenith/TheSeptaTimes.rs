@@ -62,10 +62,11 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  arrivals  Find the next arrivals at a given train station
   next      Search for the next train going from an origin to a destination
-  stations  Get all valid station names
+  arrivals  Find the next arrivals at a given train station
   train     Track a given train using it's number
+  stations  Get all valid station names
+  refresh   Refresh the cache for station names
 ```
 
 > Get times for the next two trains that go from a given train station to another
@@ -86,6 +87,11 @@ tst train 9374
 > Get all valid train station names
 ```sh
 tst stations
+```
+
+> Refresh the cache for station names
+```sh
+tst refresh
 ```
 
 ### ❖ Advanced Usage

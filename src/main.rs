@@ -19,11 +19,11 @@ fn main() {
                 Options:\n  \
                 --help  Show this message and exit.\n\n\
                 Commands:\n  \
-                  arrivals  Find the next arrivals at a given train station\n  \
                   next      Search for the next train going from an origin to a destination\n  \
+                  arrivals  Find the next arrivals at a given train station\n  \
+                  train     Track a given train using it's number\n  \
                   stations  Get all valid station names\n  \
-                  train     Track a given train using it's number\n");
-            std::process::exit(0);
+                  refresh   Refresh the cache for station names\n");
         },
         ["arrivals", station] => {
             if !stations.exists(station) {
@@ -60,8 +60,13 @@ fn main() {
             for station in stations.stations().iter() {
                 println!("{station}");
             }
-            std::process::exit(0);
-        }
+        },
+        ["refresh"] => {
+            match Stations::refresh() {
+                Ok(_) => println!("Successfully updated the cache for station names"),
+                Err(_) => println!("Unable to update the cache for station names")
+            }
+        },
         [..] => {
             println!("Invalid command: use --help or -h for usage details");
             std::process::exit(1);
