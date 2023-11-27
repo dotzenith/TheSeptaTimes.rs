@@ -83,7 +83,7 @@ tst next 'suburban' '30th'
 
 #### List the next 6 arrivals at a given train station:
 ```sh
-tst arrivals '30th Street Station' 6
+tst arrivals '30th Street Station' --count 6
 ```
 
 #### Take a look at any given train's schedule using the train number:
