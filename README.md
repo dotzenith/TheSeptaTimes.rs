@@ -56,17 +56,19 @@ cargo build --release
 ### ❖ Usage
 
 ```
-Usage: tst [OPTIONS] COMMAND [ARGS]...
-
-Options:
-  --help  Show this message and exit.
+Usage: tst <COMMAND>
 
 Commands:
   next      Search for the next train going from an origin to a destination
   arrivals  Find the next arrivals at a given train station
-  train     Track a given train using it's number
+  train     Track a given train
   stations  Get all valid station names
   refresh   Refresh the cache for station names
+  help      Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version
 ```
 
 #### Get times for the next two trains that go from a given train station to another:
@@ -102,7 +104,7 @@ tst refresh
 ---
 
 ### ❖ What's New? 
-0.3.0 - Add fuzzy matching for stations
+0.4.0 - Add a proper CLI parser
 
 ---
 

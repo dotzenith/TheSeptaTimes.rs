@@ -1,6 +1,6 @@
 [package]
 name = "the-septa-times"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 description = "A CLI application for the SEPTA API"
 repository = "https://github.com/dotzenith/TheSeptaTimes.rs"
@@ -14,12 +14,13 @@ path = "src/main.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-reqwest = { version = "0.11.20", features = ["blocking", "json"] }
-openssl = { version = "0.10", features = ["vendored"] }
-serde = { version = "1.0.192", features = ["derive"] }
-platform-dirs = "0.3.0"
-scraper = "0.18.1"
+colored = "2"
 bincode = "1.3.3"
 anyhow = "1.0.75"
-colored = "2"
+scraper = "0.18.1"
+platform-dirs = "0.3.0"
 fuzzy-matcher = "0.3.7"
+clap = { version = "4.4.9", features = ["cargo"] }
+serde = { version = "1.0.192", features = ["derive"] }
+openssl = { version = "0.10", features = ["vendored"] }
+reqwest = { version = "0.11.20", features = ["blocking", "json"] }
