@@ -58,7 +58,10 @@ fn main() {
                     std::process::exit(1)
                 }
                 (Ok(matching_start), Ok(matching_end)) => {
-                    NextToArrive::print(NextToArrive::get(matching_start, matching_end, count));
+                    let Ok(_) = NextToArrive::print(NextToArrive::get(matching_start, matching_end, count)) else {
+                        eprintln!("An error occurred while getting next trains");
+                        std::process::exit(1)
+                    };
                 }
             }
         }
@@ -66,7 +69,12 @@ fn main() {
             let station = sub_matches.get_one::<String>("station").expect("required");
             let count = *sub_matches.get_one::<u8>("count").unwrap();
             match stations.fuzzy_search(station) {
-                Ok(matching_station) => Arrival::print(Arrival::get(matching_station, count)),
+                Ok(matching_station) => {
+                    let Ok(_) = Arrival::print(Arrival::get(matching_station, count)) else {
+                        eprintln!("An error occurred while getting arrivals");
+                        std::process::exit(1)
+                    };
+                }
                 Err(_) => {
                     eprintln!("Invalid station, please use `tst stations` for all valid station names");
                     std::process::exit(1)
@@ -75,7 +83,10 @@ fn main() {
         }
         Some(("train", sub_matches)) => {
             let train_num = sub_matches.get_one::<String>("number").expect("required");
-            TrainSchedule::print(TrainSchedule::get(train_num));
+            let Ok(_) = TrainSchedule::print(TrainSchedule::get(train_num)) else {
+                eprintln!("An error occurred while getting train schedule");
+                std::process::exit(1)
+            };
         }
         Some(("stations", _)) => {
             for station in stations.get_stations().iter() {

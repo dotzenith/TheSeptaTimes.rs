@@ -104,7 +104,7 @@ tst refresh
 ---
 
 ### ❖ What's New? 
-0.4.0 - Add a proper CLI parser
+0.4.1 - Internal changes to the printing functionality
 
 ---
 
