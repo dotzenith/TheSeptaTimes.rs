@@ -28,19 +28,24 @@ TheSeptaTimes.rs is an easy-to-use commandline utility to fetch information abou
 
 ### ❖ Installation
 
+#### Shell
+```sh
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/dotzenith/TheSeptaTimes.rs/releases/latest/download/the-septa-times-installer.sh | sh
+```
+
 #### Brew
 ```sh
 brew tap dotzenith/tap
-brew install TheSeptaTimes
+brew install the-septa-times
 ```
-
-#### Binaries
-Pre-Compiled binaries for Linux and MacOS are available in [Releases](https://github.com/dotzenith/TheSeptaTimes.rs/releases)
 
 #### Cargo
 ```sh
 cargo install the-septa-times
 ```
+
+#### Binaries
+Pre-Compiled binaries for Linux and MacOS are available in [Releases](https://github.com/dotzenith/TheSeptaTimes.rs/releases)
 
 #### Source
 - First, install [rust](https://rustup.rs/)
