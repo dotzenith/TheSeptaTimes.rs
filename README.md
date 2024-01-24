@@ -104,7 +104,7 @@ tst refresh
 ---
 
 ### ❖ What's New? 
-0.4.1 - Internal changes to the printing functionality
+0.4.2 - Manage releases using cargo-dist
 
 ---
 
