@@ -109,7 +109,7 @@ tst refresh
 ---
 
 ### ❖ What's New? 
-0.4.2 - Manage releases using cargo-dist
+0.5.0 - Next To Arrive now properly shows connecting trains
 
 ---
 
