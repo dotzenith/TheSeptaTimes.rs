@@ -67,14 +67,37 @@ impl Parse for NextToArrive {
         self.0
             .iter()
             .map(|train| {
-                format!(
-                    "{:<11}{:<13}{:<11}{:<9}{}",
-                    train["orig_train"].as_deref().unwrap_or("None"),
-                    train["orig_departure_time"].as_deref().unwrap_or("None"),
-                    train["orig_arrival_time"].as_deref().unwrap_or("None"),
-                    train["orig_delay"].as_deref().unwrap_or("None"),
-                    train["orig_line"].as_deref().unwrap_or("None")
-                )
+                if train["isdirect"].as_deref().unwrap_or("None") == "true" {
+                    format!(
+                        "{:<11}{:<13}{:<11}{:<9}{}",
+                        train["orig_train"].as_deref().unwrap_or("None"),
+                        train["orig_departure_time"].as_deref().unwrap_or("None"),
+                        train["orig_arrival_time"].as_deref().unwrap_or("None"),
+                        train["orig_delay"].as_deref().unwrap_or("None"),
+                        train["orig_line"].as_deref().unwrap_or("None")
+                    )
+                } else {
+                    let first = format!(
+                        "{:<11}{:<13}{:<11}{:<9}{}",
+                        train["orig_train"].as_deref().unwrap_or("None"),
+                        train["orig_departure_time"].as_deref().unwrap_or("None"),
+                        train["orig_arrival_time"].as_deref().unwrap_or("None"),
+                        train["orig_delay"].as_deref().unwrap_or("None"),
+                        train["orig_line"].as_deref().unwrap_or("None")
+                    );
+
+                    let header = format!("Connection: {}", train["Connection"].as_deref().unwrap_or("None"));
+
+                    let second = format!(
+                        "{:<11}{:<13}{:<11}{:<9}{}",
+                        train["term_train"].as_deref().unwrap_or("None"),
+                        train["term_depart_time"].as_deref().unwrap_or("None"),
+                        train["term_arrival_time"].as_deref().unwrap_or("None"),
+                        train["term_delay"].as_deref().unwrap_or("None"),
+                        train["term_line"].as_deref().unwrap_or("None")
+                    );
+                    format!("{:^width$}\n{}\n{}\n", header, first, second, width = first.len())
+                }
             })
             .collect()
     }
