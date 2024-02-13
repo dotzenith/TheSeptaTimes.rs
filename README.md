@@ -114,7 +114,7 @@ tst refresh
 ---
 
 ### ❖ What's New? 
-0.5.1 - Added builds for windows and ARM linux
+0.5.2 - Change how connecting trains are displayed
 
 ---
 

@@ -1,4 +1,5 @@
 use crate::data::{Arrival, NextToArrive, TrainSchedule};
+use colored::Colorize;
 
 pub fn parse_time(time: Option<&str>) -> String {
     if time.is_none() {
@@ -86,7 +87,7 @@ impl Parse for NextToArrive {
                         train["orig_line"].as_deref().unwrap_or("None")
                     );
 
-                    let header = format!("Connection: {}", train["Connection"].as_deref().unwrap_or("None"));
+                    let connection = format!("Connection: {}", train["Connection"].as_deref().unwrap_or("None")).blue();
 
                     let second = format!(
                         "{:<11}{:<13}{:<11}{:<9}{}",
@@ -96,7 +97,7 @@ impl Parse for NextToArrive {
                         train["term_delay"].as_deref().unwrap_or("None"),
                         train["term_line"].as_deref().unwrap_or("None")
                     );
-                    format!("{:^width$}\n{}\n{}\n", header, first, second, width = first.len())
+                    format!("{}\n{:^width$}\n{}\n", first, connection, second, width = first.len())
                 }
             })
             .collect()
