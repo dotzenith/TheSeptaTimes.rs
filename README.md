@@ -39,13 +39,18 @@ brew tap dotzenith/tap
 brew install the-septa-times
 ```
 
+#### Powershell
+```sh
+irm https://github.com/dotzenith/lovesay.rs/releases/latest/download/the-septa-times-installer.ps1 | iex
+```
+
 #### Cargo
 ```sh
 cargo install the-septa-times
 ```
 
 #### Binaries
-Pre-Compiled binaries for Linux and MacOS are available in [Releases](https://github.com/dotzenith/TheSeptaTimes.rs/releases)
+Pre-Compiled binaries for linux, mac, and windows are available in [Releases](https://github.com/dotzenith/TheSeptaTimes.rs/releases)
 
 #### Source
 - First, install [rust](https://rustup.rs/)
@@ -109,7 +114,7 @@ tst refresh
 ---
 
 ### ❖ What's New? 
-0.5.0 - Next To Arrive now properly shows connecting trains
+0.5.1 - Added builds for windows and ARM linux
 
 ---
 
