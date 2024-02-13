@@ -41,7 +41,7 @@ brew install the-septa-times
 
 #### Powershell
 ```sh
-irm https://github.com/dotzenith/lovesay.rs/releases/latest/download/the-septa-times-installer.ps1 | iex
+irm https://github.com/dotzenith/TheSeptaTimes.rs/releases/latest/download/the-septa-times-installer.ps1 | iex
 ```
 
 #### Cargo
