@@ -1,6 +1,6 @@
 [package]
 name = "the-septa-times"
-version = "0.5.2"
+version = "0.5.3"
 edition = "2021"
 description = "A CLI application for the SEPTA API"
 repository = "https://github.com/dotzenith/TheSeptaTimes.rs"
@@ -22,8 +22,7 @@ platform-dirs = "0.3.0"
 fuzzy-matcher = "0.3.7"
 clap = { version = "4.4.9", features = ["cargo"] }
 serde = { version = "1.0.192", features = ["derive"] }
-openssl = { version = "0.10", features = ["vendored"] }
-reqwest = { version = "0.11.20", features = ["blocking", "json"] }
+reqwest = { version = "0.11.20", features = ["blocking", "json", "rustls-tls"] }
 
 # The profile that 'cargo dist' will build with
 [profile.dist]

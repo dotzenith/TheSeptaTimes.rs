@@ -114,7 +114,7 @@ tst refresh
 ---
 
 ### ❖ What's New? 
-0.5.2 - Change how connecting trains are displayed
+0.5.3 - use rustls for reqwest
 
 ---
 
