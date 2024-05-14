@@ -114,7 +114,7 @@ tst refresh
 ---
 
 ### ❖ What's New? 
-0.5.3 - use rustls for reqwest
+0.5.4 - use rustls for reqwest
 
 ---
 
