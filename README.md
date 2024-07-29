@@ -114,7 +114,7 @@ tst refresh
 ---
 
 ### ❖ What's New? 
-0.5.4 - use rustls for reqwest
+0.6.0 - Allow stations to be addressed by their common names
 
 ---
 
