@@ -51,12 +51,19 @@ impl Stations {
             return Err(anyhow!("No matching value"));
         }
 
-        Ok(&self.stations[results
+        let mut station: &str = &self.stations[results
             .iter()
             .enumerate()
             .max_by(|(_, a), (_, b)| a.cmp(b))
             .map(|(index, _)| index)
-            .context("Could not get the index of matching value")?])
+            .context("Could not get the index of matching value")?];
+
+        match station.split_once('(') {
+            Some((first, _)) => station = first.trim(),
+            None => (),
+        }
+
+        Ok(station)
     }
 
     fn get_stations_from_file_or_url() -> Result<Vec<String>> {
@@ -75,12 +82,26 @@ impl Stations {
         let html_content = Html::parse_document(&response?.text()?);
         let selector = Selector::parse("table > tbody > tr > td").unwrap();
 
-        let stations: Vec<String> = html_content
+        let mut stations: Vec<String> = vec![];
+        for row in html_content
             .select(&selector)
-            .skip(1)
-            .step_by(2)
-            .map(|content| content.inner_html().to_owned())
-            .collect();
+            .map(|content| content.inner_html())
+            .collect::<Vec<String>>()
+            .chunks_mut(2)
+        {
+            // Hacky, but I don't want to check every station for the &amp;
+            // row[0] == Station Name; row[1] == Parameter
+            match row[1].as_str() {
+                "Airport Terminal C-D" => row[0] = "Airport Terminal C & D".to_owned(),
+                "Airport Terminal E-F" => row[0] = "Airport Terminal E & F".to_owned(),
+                _ => (),
+            }
+            if row[0] == row[1] {
+                stations.push(row[1].to_owned());
+            } else {
+                stations.push(format!("{} ({})", &row[1], &row[0]));
+            }
+        }
         Ok(stations)
     }
 
@@ -119,30 +140,30 @@ impl Stations {
 pub const URL: &str = "https://www3.septa.org/api";
 
 const FALLBACK_STATIONS: [&'static str; 154] = [
-    "9th St",
+    "9th St (9th Street Station)",
     "30th Street Station",
-    "49th St",
+    "49th St (49th Street)",
     "Airport Terminal A",
-    "airport terminal B",
-    "airport terminal C-D",
-    "airport terminal E-F",
+    "Airport Terminal B",
+    "Airport Terminal C-D (Airport Terminal C & D)",
+    "Airport Terminal E-F (Airport Terminal E & F)",
     "Allegheny",
     "Allen Lane",
     "Ambler",
     "Angora",
     "Ardmore",
     "Ardsley",
-    "Aala",
-    "Aerwyn",
-    "Aethayres",
-    "Aridesburg",
-    "Aristol",
+    "Bala",
+    "Berwyn",
+    "Bethayres",
+    "Bridesburg",
+    "Bristol",
     "Bryn Mawr",
     "Carpenter",
     "Chalfont",
     "Chelten Avenue",
     "Cheltenham",
-    "Chester TC",
+    "Chester TC (Chester Transportation Center)",
     "Chestnut Hill East",
     "Chestnut Hill West",
     "Churchmans Crossing",
@@ -167,28 +188,29 @@ const FALLBACK_STATIONS: [&'static str; 154] = [
     "Eddington",
     "Eddystone",
     "Elkins Park",
-    "Elm St",
-    "Elwyn Station",
+    "Elm St (Elm Street, Norristown)",
+    "Elwyn Station (Elwyn)",
     "Exton",
-    "Fern Rock TC",
-    "Fernwood",
+    "Fern Rock TC (Fern Rock Transportation Center)",
+    "Fernwood (Fernwood–Yeadon)",
     "Folcroft",
     "Forest Hills",
-    "Ft Washington",
+    "Ft Washington (Fort Washington)",
     "Fortuna",
     "Fox Chase",
     "Germantown",
     "Gladstone",
+    "Glenolden",
     "Glenside",
     "Gravers",
     "Gwynedd Valley",
     "Hatboro",
     "Haverford",
     "Highland",
-    "Highland Ave",
-    "Holmesburg Jct",
+    "Highland Ave (Highland Avenue)",
+    "Holmesburg Jct (Holmesburg Junction)",
     "Ivy Ridge",
-    "Market East",
+    "Market East (Jefferson Station (Market East))",
     "Jenkintown-Wyncote",
     "Langhorne",
     "Lansdale",
@@ -196,7 +218,7 @@ const FALLBACK_STATIONS: [&'static str; 154] = [
     "Lawndale",
     "Levittown",
     "Link Belt",
-    "Main St",
+    "Main St (Main Street, Norristown)",
     "Malvern",
     "Manayunk",
     "Marcus Hook",
@@ -206,15 +228,15 @@ const FALLBACK_STATIONS: [&'static str; 154] = [
     "Merion",
     "Miquon",
     "Morton",
-    "Mt Airy",
+    "Mt Airy (Mount Airy)",
     "Moylan-Rose Valley",
     "Narberth",
     "Neshaminy Falls",
     "New Britain",
     "Newark",
     "Noble",
-    "Norristown TC",
-    "North Broad St",
+    "Norristown TC (Norristown Transportation Center)",
+    "North Broad St (North Broad)",
     "North Hills",
     "North Philadelphia",
     "North Wales",
@@ -225,7 +247,7 @@ const FALLBACK_STATIONS: [&'static str; 154] = [
     "Paoli",
     "Penllyn",
     "Pennbrook",
-    "Penn Medicine Station",
+    "Penn Medicine Station (Penn Medicine Station (University City))",
     "Philmont",
     "Primos",
     "Prospect Park",
@@ -247,12 +269,11 @@ const FALLBACK_STATIONS: [&'static str; 154] = [
     "Strafford",
     "Suburban Station",
     "Swarthmore",
-    "Swarthmore",
     "Tacony",
-    "Temple U",
+    "Temple U (Temple University)",
     "Thorndale",
     "Torresdale",
-    "Trenton",
+    "Trenton (Trenton Transit Center)",
     "Trevose",
     "Tulpehocken",
     "Upsal",
@@ -261,7 +282,7 @@ const FALLBACK_STATIONS: [&'static str; 154] = [
     "Warminster",
     "Washington Lane",
     "Wayne",
-    "Wayne Jct",
+    "Wayne Jct (Wayne Junction)",
     "West Trenton",
     "Whitford",
     "Willow Grove",
