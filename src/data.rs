@@ -13,6 +13,7 @@ use std::time::SystemTime;
 pub struct NextToArrive(pub Vec<HashMap<String, Option<String>>>);
 pub struct Arrival(pub HashMap<String, Vec<HashMap<String, Vec<HashMap<String, Option<String>>>>>>);
 pub struct TrainSchedule(pub Vec<HashMap<String, Option<String>>>);
+pub struct BusAndTrolleyLocations(pub HashMap<String, Vec<HashMap<String, Option<String>>>>);
 
 pub struct Stations {
     stations: Vec<String>,

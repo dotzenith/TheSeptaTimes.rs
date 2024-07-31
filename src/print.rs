@@ -1,4 +1,4 @@
-use crate::data::{Arrival, NextToArrive, TrainSchedule};
+use crate::data::{Arrival, NextToArrive, TrainSchedule, BusAndTrolleyLocations};
 use crate::parse::Parse;
 use anyhow::Result;
 use colored::Colorize;
@@ -54,6 +54,23 @@ impl Print for TrainSchedule {
             "Station".yellow(),
             "Scheduled Time".cyan(),
             "Actual Time".green(),
+        );
+        for train in train_schedule.parse().iter() {
+            println!("{train}");
+        }
+        Ok(())
+    }
+}
+
+impl Print for BusAndTrolleyLocations {
+    fn print(result: Result<Self>) -> Result<()>{
+        let train_schedule = result?;
+        println!(
+            "{:<5}{:<40}{:<15}{}",
+            "Route".yellow(),
+            "Next Stop".cyan(),
+            "Direction".green(),
+            "Destination".magenta()
         );
         for train in train_schedule.parse().iter() {
             println!("{train}");

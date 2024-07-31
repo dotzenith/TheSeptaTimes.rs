@@ -3,7 +3,7 @@ mod data;
 mod parse;
 mod print;
 
-use crate::data::{Arrival, NextToArrive, Stations, TrainSchedule};
+use crate::data::{Arrival, NextToArrive, Stations, TrainSchedule, BusAndTrolleyLocations};
 use crate::print::Print;
 use clap::{arg, command, Command};
 
@@ -42,6 +42,11 @@ fn main() {
             Command::new("train")
                 .about("Track a given train")
                 .arg(arg!(number: [TRAIN_NUM])),
+        )
+        .subcommand(
+            Command::new("trolley")
+                .about("Get current status on a trolley route")
+                .arg(arg!(number: [ROUTE_NUM])),
         )
         .subcommand(Command::new("stations").about("Get all valid station names"))
         .subcommand(
@@ -88,6 +93,13 @@ fn main() {
             let train_num = sub_matches.get_one::<String>("number").expect("required");
             let Ok(_) = TrainSchedule::print(TrainSchedule::get(train_num)) else {
                 eprintln!("An error occurred while getting train schedule");
+                std::process::exit(1)
+            };
+        }
+        Some(("trolley", sub_matches)) => {
+            let train_num = sub_matches.get_one::<String>("number").expect("required");
+            let Ok(_) = BusAndTrolleyLocations::print(BusAndTrolleyLocations::get(train_num)) else {
+                eprintln!("An error occurred while getting trolley data");
                 std::process::exit(1)
             };
         }

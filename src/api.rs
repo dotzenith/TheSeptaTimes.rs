@@ -1,4 +1,4 @@
-use crate::data::{Arrival, NextToArrive, TrainSchedule, URL};
+use crate::data::{Arrival, NextToArrive, TrainSchedule, URL, BusAndTrolleyLocations};
 use anyhow::Result;
 use reqwest::blocking::get;
 
@@ -22,6 +22,14 @@ impl TrainSchedule {
     pub fn get(num: &str) -> Result<TrainSchedule> {
         let request_url = format!("{}/RRSchedules/index.php?req1={}", URL, num);
         let result = TrainSchedule(get(request_url)?.json()?);
+        Ok(result)
+    }
+}
+
+impl BusAndTrolleyLocations {
+    pub fn get(route: &str) -> Result<BusAndTrolleyLocations> {
+        let request_url = format!("{}/TransitView/index.php?route={}", URL, route);
+        let result = BusAndTrolleyLocations(get(request_url)?.json()?);
         Ok(result)
     }
 }

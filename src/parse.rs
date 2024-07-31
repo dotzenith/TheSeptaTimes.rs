@@ -1,4 +1,4 @@
-use crate::data::{Arrival, NextToArrive, TrainSchedule};
+use crate::data::{Arrival, NextToArrive, TrainSchedule, BusAndTrolleyLocations};
 use colored::Colorize;
 
 pub fn parse_time(time: Option<&str>) -> String {
@@ -114,6 +114,23 @@ impl Parse for TrainSchedule {
                     train["station"].as_deref().unwrap_or("None"),
                     train["sched_tm"].as_deref().unwrap_or("None"),
                     train["act_tm"].as_deref().unwrap_or("None")
+                )
+            })
+            .collect()
+    }
+}
+
+impl Parse for BusAndTrolleyLocations {
+    fn parse(&self) -> Vec<String> {
+        self.0.get("bus").unwrap()
+            .iter()
+            .map(|bus| {
+                format!(
+                    "{:<5}{:<40}{:<15}{}",
+                    bus["route_id"].as_deref().unwrap_or("None"),
+                    bus["next_stop_name"].as_deref().unwrap_or("None"),
+                    bus["direction"].as_deref().unwrap_or("None"),
+                    bus["destination"].as_deref().unwrap_or("None")
                 )
             })
             .collect()
