@@ -106,7 +106,8 @@ tst train 9374
 tst stations
 ```
 
-#### Refresh the cache for station names:
+#### Manually refresh the cache for station names:
+> tst automatically refreshes the cache every week, this command is usually not needed
 ```sh
 tst refresh
 ```
@@ -114,7 +115,7 @@ tst refresh
 ---
 
 ### ❖ What's New? 
-0.6.0 - Allow stations to be addressed by their common names
+0.6.1 - Use TTL caching for station names
 
 ---
 

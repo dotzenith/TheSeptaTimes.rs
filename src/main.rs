@@ -44,7 +44,10 @@ fn main() {
                 .arg(arg!(number: [TRAIN_NUM])),
         )
         .subcommand(Command::new("stations").about("Get all valid station names"))
-        .subcommand(Command::new("refresh").about("Refresh the cache for station names"))
+        .subcommand(
+            Command::new("refresh")
+                .about("Manually refresh the cache for station names (note: tst automatically refreshes every week)"),
+        )
         .get_matches();
 
     match matches.subcommand() {

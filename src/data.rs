@@ -5,8 +5,10 @@ use fuzzy_matcher::FuzzyMatcher;
 use platform_dirs::AppDirs;
 use scraper::{Html, Selector};
 use std::collections::HashMap;
+use std::fs;
 use std::fs::{create_dir, OpenOptions};
 use std::io::{BufReader, BufWriter};
+use std::time::SystemTime;
 
 pub struct NextToArrive(pub Vec<HashMap<String, Option<String>>>);
 pub struct Arrival(pub HashMap<String, Vec<HashMap<String, Vec<HashMap<String, Option<String>>>>>>);
@@ -126,6 +128,16 @@ impl Stations {
     fn read_stations_from_file() -> Result<Vec<String>> {
         let app_dirs = AppDirs::new(Some("TheSeptaTimes"), true).context("Unable to get AppDirs")?;
 
+        let metadata = fs::metadata(app_dirs.cache_dir.join("stations"))?;
+        let time = metadata.modified().context("Unsupported platform")?;
+        let diff = SystemTime::now()
+            .duration_since(time)
+            .context("Time went backwards")?
+            .as_secs();
+        if diff > SECONDS_IN_WEEK {
+            return Err(anyhow!("Station name cache too old"));
+        }
+
         let mut f = BufReader::new(
             OpenOptions::new()
                 .read(true)
@@ -136,6 +148,8 @@ impl Stations {
         Ok(stations)
     }
 }
+
+const SECONDS_IN_WEEK: u64 = 604800;
 
 pub const URL: &str = "https://www3.septa.org/api";
 
