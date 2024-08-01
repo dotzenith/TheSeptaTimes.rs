@@ -1,11 +1,13 @@
-mod api;
-mod data;
-mod parse;
-mod print;
+mod endpoints;
+mod stations;
+mod traits;
 
-use crate::data::{Arrival, NextToArrive, Stations, TrainSchedule};
-use crate::print::Print;
+use crate::endpoints::{Arrivals, NextToArrive, TrainSchedule};
+use crate::stations::Stations;
+use crate::traits::PrettyPrint;
 use clap::{arg, command, Command};
+
+pub const URL: &str = "https://www3.septa.org/api";
 
 fn main() {
     let stations = Stations::new();
@@ -61,10 +63,13 @@ fn main() {
                     std::process::exit(1)
                 }
                 (Ok(matching_start), Ok(matching_end)) => {
-                    let Ok(_) = NextToArrive::print(NextToArrive::get(matching_start, matching_end, count)) else {
-                        eprintln!("An error occurred while getting next trains");
-                        std::process::exit(1)
-                    };
+                    match NextToArrive::get(matching_start, matching_end, count) {
+                        Ok(next) => next.print(),
+                        Err(err) => {
+                            eprintln!("An error occurred while getting next trains: {:?}", err);
+                            std::process::exit(1)
+                        }
+                    }
                 }
             }
         }
@@ -72,12 +77,13 @@ fn main() {
             let station = sub_matches.get_one::<String>("station").expect("required");
             let count = *sub_matches.get_one::<u8>("count").unwrap();
             match stations.fuzzy_search(station) {
-                Ok(matching_station) => {
-                    let Ok(_) = Arrival::print(Arrival::get(matching_station, count)) else {
-                        eprintln!("An error occurred while getting arrivals");
+                Ok(matching_station) => match Arrivals::get(matching_station, count) {
+                    Ok(arr) => arr.print(),
+                    Err(err) => {
+                        eprintln!("An error occurred while getting arrivals: {:?}", err);
                         std::process::exit(1)
-                    };
-                }
+                    }
+                },
                 Err(_) => {
                     eprintln!("Invalid station, please use `tst stations` for all valid station names");
                     std::process::exit(1)
@@ -86,10 +92,13 @@ fn main() {
         }
         Some(("train", sub_matches)) => {
             let train_num = sub_matches.get_one::<String>("number").expect("required");
-            let Ok(_) = TrainSchedule::print(TrainSchedule::get(train_num)) else {
-                eprintln!("An error occurred while getting train schedule");
-                std::process::exit(1)
-            };
+            match TrainSchedule::get(train_num) {
+                Ok(train) => train.print(),
+                Err(err) => {
+                    eprintln!("An error occurred while getting train schedule: {:?}", err);
+                    std::process::exit(1)
+                }
+            }
         }
         Some(("stations", _)) => {
             for station in stations.get_stations().iter() {
