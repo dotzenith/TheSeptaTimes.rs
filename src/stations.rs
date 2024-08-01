@@ -4,15 +4,10 @@ use fuzzy_matcher::skim::SkimMatcherV2;
 use fuzzy_matcher::FuzzyMatcher;
 use platform_dirs::AppDirs;
 use scraper::{Html, Selector};
-use std::collections::HashMap;
 use std::fs;
 use std::fs::{create_dir, OpenOptions};
 use std::io::{BufReader, BufWriter};
 use std::time::SystemTime;
-
-pub struct NextToArrive(pub Vec<HashMap<String, Option<String>>>);
-pub struct Arrival(pub HashMap<String, Vec<HashMap<String, Vec<HashMap<String, Option<String>>>>>>);
-pub struct TrainSchedule(pub Vec<HashMap<String, Option<String>>>);
 
 pub struct Stations {
     stations: Vec<String>,
@@ -150,8 +145,6 @@ impl Stations {
 }
 
 const SECONDS_IN_WEEK: u64 = 604800;
-
-pub const URL: &str = "https://www3.septa.org/api";
 
 const FALLBACK_STATIONS: [&'static str; 154] = [
     "9th St (9th Street Station)",
