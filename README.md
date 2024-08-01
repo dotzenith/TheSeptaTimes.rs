@@ -115,7 +115,7 @@ tst refresh
 ---
 
 ### ❖ What's New? 
-0.6.1 - Use TTL caching for station names
+0.6.2 - Use TTL caching for station names
 
 ---
 
