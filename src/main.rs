@@ -177,11 +177,7 @@ fn main() {
                     }
                 }
                 Some(("lines", _)) => match manager.get_lines() {
-                    Ok(lines) => {
-                        for line in lines.iter() {
-                            println!("{line}");
-                        }
-                    }
+                    Ok(lines) => lines.print(),
                     Err(_) => {
                         eprintln!("An error occurred while getting lines, please check your SeptaPlusPlus URL");
                         std::process::exit(1)

@@ -1,5 +1,7 @@
-use crate::ScheduleDirection;
+use super::ScheduleDirection;
+use crate::traits::{Parse, PrettyPrint};
 use anyhow::{anyhow, Context, Result};
+use colored::Colorize;
 use fuzzy_matcher::skim::SkimMatcherV2;
 use fuzzy_matcher::FuzzyMatcher;
 use reqwest::blocking::get;
@@ -15,6 +17,24 @@ pub struct LinesInner {
 
 #[derive(Deserialize, Debug)]
 pub struct Lines(pub Vec<LinesInner>);
+
+impl Parse for Lines {
+    fn parse(&self) -> Vec<String> {
+        self.0
+            .iter()
+            .map(|item| format!("{:<6}{}", item.line_code, item.line_name))
+            .collect()
+    }
+}
+
+impl PrettyPrint for Lines {
+    fn print(&self) {
+        println!("{:<6}{}", "Code".blue(), "Name".green());
+        for train in self.parse().iter() {
+            println!("{train}");
+        }
+    }
+}
 
 #[allow(dead_code)]
 #[derive(Deserialize, Debug)]
@@ -42,10 +62,10 @@ impl SeptaPlusPlusManager {
         })
     }
 
-    pub fn get_lines(&self) -> Result<Vec<String>> {
+    pub fn get_lines(&self) -> Result<Lines> {
         let request_url = format!("{}/schedule/lines", &self.url);
         let result: Lines = get(request_url)?.json()?;
-        Ok(result.0.into_iter().map(|item| item.line_code).collect())
+        Ok(result)
     }
 
     pub fn get_stations_for_line(&self, line: &str, direction: &ScheduleDirection) -> Result<Vec<String>> {
