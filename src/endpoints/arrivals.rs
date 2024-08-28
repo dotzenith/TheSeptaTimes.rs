@@ -37,7 +37,7 @@ impl Arrivals {
     }
 }
 
-pub fn parse_time(time: Option<&String>) -> String {
+pub fn parse_time(time: Option<&str>) -> String {
     if time.is_none() {
         return "None".to_owned();
     }
@@ -68,7 +68,7 @@ impl Parse for Arrivals {
                     "North",
                     train.train_id.as_ref().map_or("None", |orig| orig.as_str()),
                     train.next_station.as_ref().map_or("None", |orig| orig.as_str()),
-                    parse_time(train.sched_time.as_ref()),
+                    parse_time(train.sched_time.as_ref().map(|s| s.as_str())),
                     train.status.as_ref().map_or("None", |orig| orig.as_str()),
                     train.destination.as_ref().map_or("None", |orig| orig.as_str())
                 )
@@ -84,7 +84,7 @@ impl Parse for Arrivals {
                         "South",
                         train.train_id.as_ref().map_or("None", |orig| orig.as_str()),
                         train.next_station.as_ref().map_or("None", |orig| orig.as_str()),
-                        parse_time(train.sched_time.as_ref()),
+                        parse_time(train.sched_time.as_ref().map(|s| s.as_str())),
                         train.status.as_ref().map_or("None", |orig| orig.as_str()),
                         train.destination.as_ref().map_or("None", |orig| orig.as_str())
                     )
