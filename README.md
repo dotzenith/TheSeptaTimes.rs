@@ -1,4 +1,4 @@
-<h2 align="center"> ━━━━━━  ❖  ━━━━━━ </h2>
+<h1 align="center"> ━━━━━━  ❖  ━━━━━━ </h1>
 
 <!-- BADGES -->
 <div align="center">
@@ -18,7 +18,7 @@
 
 ---
 
-### ❖ TheSeptaTimes.rs
+## ❖ TheSeptaTimes.rs
 
 TheSeptaTimes.rs is an easy-to-use commandline utility to fetch information about regional SEPTA trains
 
@@ -26,7 +26,7 @@ TheSeptaTimes.rs is an easy-to-use commandline utility to fetch information abou
 
 ---
 
-### ❖ Installation
+## ❖ Installation
 
 #### Shell
 ```sh
@@ -63,9 +63,11 @@ cargo build --release
 
 ---
 
-### ❖ Usage
+## ❖ Usage
 
 ```
+A CLI application for the SEPTA API
+
 Usage: tst <COMMAND>
 
 Commands:
@@ -73,13 +75,16 @@ Commands:
   arrivals  Find the next arrivals at a given train station
   train     Track a given train
   stations  Get all valid station names
-  refresh   Refresh the cache for station names
+  extra     All of the extra endpoints added by SepatPlusPlus
+  refresh   Manually refresh the cache for station names (note: tst automatically refreshes every week)
   help      Print this message or the help of the given subcommand(s)
 
 Options:
   -h, --help     Print help
   -V, --version  Print version
 ```
+
+### ❖ Base commands
 
 #### Get times for the next two trains that go from a given train station to another:
 ```sh
@@ -112,10 +117,35 @@ tst stations
 tst refresh
 ```
 
+### ❖ Extra commands provided by [SeptaPlusPlus](https://github.com/dotzenith/SeptaPlusPlus)
+
+These commands require endpoints provided by [SeptaPlusPlus](https://github.com/dotzenith/SeptaPlusPlus).
+`tst` requires the `SeptaPlusPlusURL` environment variable to be set like:
+
+```sh
+export SeptaPlusPlusURL="https://septa.jawn.website/api"
+```
+
+#### Get all lines supported by the `tst extra schedule` command:
+```sh
+tst extra lines
+```
+
+#### Get all stations on a given track, as supported by the `tst extra schedule` command:
+```sh
+tst extra stations TRE          # On the Trenton line
+```
+
+#### Get train schedule going from one station to another on a given line
+> This command also uses fuzzy matching so station names do not need to be exact
+```sh
+tst extra schedule TRE "Trenton" "Gray 30th Street" inbound weekday
+```
+
 ---
 
-### ❖ What's New? 
-0.6.2 - Use TTL caching for station names
+## ❖ What's New? 
+0.7.0 - Integrate [SeptaPlusPlus](https://github.com/dotzenith/SeptaPlusPlus)
 
 ---
 

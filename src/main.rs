@@ -2,10 +2,12 @@ mod endpoints;
 mod stations;
 mod traits;
 
-use crate::endpoints::{Arrivals, NextToArrive, TrainSchedule};
+use crate::endpoints::{
+    Arrivals, NextToArrive, ScheduleDirection, ScheduleMode, ScheduleOuter, SeptaPlusPlusManager, TrainSchedule,
+};
 use crate::stations::Stations;
-use crate::traits::PrettyPrint;
-use clap::{arg, command, Command};
+use crate::traits::{PrettyPrint, PrettyPrintWithMode};
+use clap::{arg, command, value_parser, Command};
 
 pub const URL: &str = "https://www3.septa.org/api";
 
@@ -22,7 +24,7 @@ fn main() {
                 .arg(arg!(to: [STATION]))
                 .arg(
                     arg!(--count <NUM>)
-                        .value_parser(clap::value_parser!(u8))
+                        .value_parser(value_parser!(u8))
                         .default_value("5")
                         .default_missing_value("5")
                         .require_equals(false),
@@ -34,7 +36,7 @@ fn main() {
                 .arg(arg!(station: [STATION]))
                 .arg(
                     arg!(--count <NUM>)
-                        .value_parser(clap::value_parser!(u8))
+                        .value_parser(value_parser!(u8))
                         .default_value("5")
                         .default_missing_value("5")
                         .require_equals(false),
@@ -46,6 +48,34 @@ fn main() {
                 .arg(arg!(number: [TRAIN_NUM])),
         )
         .subcommand(Command::new("stations").about("Get all valid station names"))
+        .subcommand(
+            Command::new("extra")
+                .about("All of the extra endpoints added by SepatPlusPlus")
+                .subcommand(
+                    Command::new("schedule")
+                        .about("Get Schedule from one station to another on a given line")
+                        .arg(arg!(line: [LINE]).help("The Regional Rail Line Code (e.g, TRE)"))
+                        .arg(arg!(orig: [ORIG]).help("Starting Station (e.g, Trenton)"))
+                        .arg(arg!(dest: [DEST]).help("Ending Station (e.g, Gray 30th Street)"))
+                        .arg(arg!(direction: [inbound_or_outbound]).value_parser(value_parser!(ScheduleDirection)))
+                        .arg(arg!(mode: [weekend_or_weekday]).value_parser(value_parser!(ScheduleMode))),
+                )
+                .subcommand(
+                    Command::new("lines").about("Get all of the lines supported by the extra schedules endpoint"),
+                )
+                .subcommand(
+                    Command::new("stations")
+                        .about("Get all of the stations for a given line")
+                        .arg(arg!(line: [LINE]).help("The Regional Rail Line Code (e.g, TRE)"))
+                        .arg(
+                            arg!(--direction <inbound_or_outbound>)
+                                .value_parser(value_parser!(ScheduleDirection))
+                                .default_value("inbound")
+                                .default_missing_value("inbound")
+                                .require_equals(false),
+                        ),
+                ),
+        )
         .subcommand(
             Command::new("refresh")
                 .about("Manually refresh the cache for station names (note: tst automatically refreshes every week)"),
@@ -109,6 +139,70 @@ fn main() {
             Ok(_) => println!("Successfully updated the cache for station names"),
             Err(_) => println!("Unable to update the cache for station names"),
         },
+        Some(("extra", extra_matches)) => {
+            let manager = match SeptaPlusPlusManager::new() {
+                Ok(man) => man,
+                Err(err) => {
+                    eprintln!("{err}");
+                    std::process::exit(1)
+                }
+            };
+            match extra_matches.subcommand() {
+                Some(("schedule", sub_matches)) => {
+                    let line = sub_matches.get_one::<String>("line").expect("required");
+                    let orig = sub_matches.get_one::<String>("orig").expect("required");
+                    let dest = sub_matches.get_one::<String>("dest").expect("required");
+                    let direction = sub_matches.get_one::<ScheduleDirection>("direction").expect("required");
+                    let mode = sub_matches.get_one::<ScheduleMode>("mode").expect("required");
+
+                    match (
+                        manager.fuzzy_match_station_for_line(line, orig, direction),
+                        manager.fuzzy_match_station_for_line(line, dest, direction),
+                    ) {
+                        (Err(_), _) | (_, Err(_)) => {
+                            eprintln!("Invalid station, please use `tst extra stations [LINE]` for all valid station names for a given line");
+                            std::process::exit(1)
+                        }
+                        (Ok(matching_orig), Ok(matching_dest)) => {
+                            match ScheduleOuter::get(line, direction, &matching_orig, &matching_dest) {
+                                Ok(schedule) => schedule.print(mode),
+                                Err(_) => {
+                                    eprintln!(
+                                        "An error occurred while getting train schedule, please check your inputs"
+                                    );
+                                    std::process::exit(1)
+                                }
+                            }
+                        }
+                    }
+                }
+                Some(("lines", _)) => match manager.get_lines() {
+                    Ok(lines) => lines.print(),
+                    Err(_) => {
+                        eprintln!("An error occurred while getting lines, please check your SeptaPlusPlus URL");
+                        std::process::exit(1)
+                    }
+                },
+
+                Some(("stations", sub_matches)) => {
+                    let line = sub_matches.get_one::<String>("line").expect("required");
+                    let direction = sub_matches.get_one::<ScheduleDirection>("direction").unwrap();
+
+                    match manager.get_stations_for_line(line, direction) {
+                        Ok(stations) => {
+                            for station in stations.iter() {
+                                println!("{station}");
+                            }
+                        }
+                        Err(_) => {
+                            eprintln!("An error occurred while getting station, please check your SeptaPlusPlus URL and inputs");
+                            std::process::exit(1)
+                        }
+                    }
+                }
+                _ => unreachable!(),
+            }
+        }
         _ => unreachable!(),
     }
 }
