@@ -76,7 +76,6 @@ Commands:
   train     Track a given train
   stations  Get all valid station names
   extra     All of the extra endpoints added by SepatPlusPlus
-  refresh   Manually refresh the cache for station names (note: tst automatically refreshes every week)
   help      Print this message or the help of the given subcommand(s)
 
 Options:
@@ -95,6 +94,7 @@ tst next '30th Street Station' 'North Philadelphia'
 ```sh
 tst next 'suburban' '30th'
 ```
+> Setting `SeptaPlusPlusURL` as seen [below](#-extra-commands-provided-by-septaplusplus) will help make the fuzzy matching more accurate, but it is optional
 
 #### List the next 6 arrivals at a given train station:
 ```sh
@@ -109,12 +109,6 @@ tst train 9374
 #### Get all valid train station names:
 ```sh
 tst stations
-```
-
-#### Manually refresh the cache for station names:
-> tst automatically refreshes the cache every week, this command is usually not needed
-```sh
-tst refresh
 ```
 
 ### ❖ Extra commands provided by [SeptaPlusPlus](https://github.com/dotzenith/SeptaPlusPlus)
@@ -145,7 +139,7 @@ tst extra schedule TRE "Trenton" "Gray 30th Street" inbound weekday
 ---
 
 ## ❖ What's New? 
-0.7.0 - Integrate [SeptaPlusPlus](https://github.com/dotzenith/SeptaPlusPlus)
+0.8.0 - Use [SeptaPlusPlus](https://github.com/dotzenith/SeptaPlusPlus) for station caching and remove manual cache refresh
 
 ---
 

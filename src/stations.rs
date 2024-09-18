@@ -3,38 +3,43 @@ use bincode::{deserialize_from, serialize_into};
 use fuzzy_matcher::skim::SkimMatcherV2;
 use fuzzy_matcher::FuzzyMatcher;
 use platform_dirs::AppDirs;
-use scraper::{Html, Selector};
+use serde::Deserialize;
+use std::env;
 use std::fs;
 use std::fs::{create_dir, OpenOptions};
 use std::io::{BufReader, BufWriter};
 use std::time::SystemTime;
 
-pub struct Stations {
+pub struct StationsManager {
     stations: Vec<String>,
     matcher: SkimMatcherV2,
 }
 
-impl Stations {
+#[allow(dead_code)]
+#[derive(Deserialize, Debug)]
+pub struct StationsInner {
+    station_name: String,
+    parameter: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Stations(pub Vec<StationsInner>);
+
+impl StationsManager {
     pub fn new() -> Self {
-        let mut stations = Stations {
+        let mut manager = StationsManager {
             stations: Vec::new(),
             matcher: SkimMatcherV2::default(),
         };
-        stations.stations = match Self::get_stations_from_file_or_url() {
+        manager.stations = match Self::get_stations_from_file_or_api() {
             Ok(stations) => stations,
             Err(_) => FALLBACK_STATIONS.into_iter().map(|str| str.to_string()).collect(),
         };
-        stations
+        manager
     }
 
     pub fn get_stations(&self) -> &Vec<String> {
         &self.stations
-    }
-
-    pub fn refresh() -> Result<()> {
-        let station = Self::fetch_stations_from_url("http://www3.septa.org/VIRegionalRail.html")?;
-        Self::save_stations_to_file(&station)?;
-        Ok(())
     }
 
     pub fn fuzzy_search(&self, search: &str) -> Result<&str> {
@@ -63,42 +68,25 @@ impl Stations {
         Ok(station)
     }
 
-    fn get_stations_from_file_or_url() -> Result<Vec<String>> {
+    fn get_stations_from_file_or_api() -> Result<Vec<String>> {
         match Self::read_stations_from_file() {
             Ok(stations) => Ok(stations),
             Err(_) => {
-                let station = Self::fetch_stations_from_url("http://www3.septa.org/VIRegionalRail.html")?;
+                let station = Self::fetch_stations_from_api()?;
                 Self::save_stations_to_file(&station)?;
                 Ok(station)
             }
         }
     }
 
-    fn fetch_stations_from_url(url: &str) -> Result<Vec<String>> {
-        let response = reqwest::blocking::get(url);
-        let html_content = Html::parse_document(&response?.text()?);
-        let selector = Selector::parse("table > tbody > tr > td").unwrap();
-
-        let mut stations: Vec<String> = vec![];
-        for row in html_content
-            .select(&selector)
-            .map(|content| content.inner_html())
-            .collect::<Vec<String>>()
-            .chunks_mut(2)
-        {
-            // Hacky, but I don't want to check every station for the &amp;
-            // row[0] == Station Name; row[1] == Parameter
-            match row[1].as_str() {
-                "Airport Terminal C-D" => row[0] = "Airport Terminal C & D".to_owned(),
-                "Airport Terminal E-F" => row[0] = "Airport Terminal E & F".to_owned(),
-                _ => (),
-            }
-            if row[0] == row[1] {
-                stations.push(row[1].to_owned());
-            } else {
-                stations.push(format!("{} ({})", &row[1], &row[0]));
-            }
-        }
+    fn fetch_stations_from_api() -> Result<Vec<String>> {
+        let base_url = env::var("SeptaPlusPlusURL").context("SeptaPlusPlusURL not set, cannot fetch stations")?;
+        let result: Stations = reqwest::blocking::get(format!("{}/stations", base_url))?.json()?;
+        let stations: Vec<String> = result
+            .0
+            .iter()
+            .map(|station| format!("{} ({})", station.parameter, station.station_name))
+            .collect();
         Ok(stations)
     }
 

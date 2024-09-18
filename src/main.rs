@@ -5,14 +5,14 @@ mod traits;
 use crate::endpoints::{
     Arrivals, NextToArrive, ScheduleDirection, ScheduleMode, ScheduleOuter, SeptaPlusPlusManager, TrainSchedule,
 };
-use crate::stations::Stations;
+use crate::stations::StationsManager;
 use crate::traits::{PrettyPrint, PrettyPrintWithMode};
 use clap::{arg, command, value_parser, Command};
 
 pub const URL: &str = "https://www3.septa.org/api";
 
 fn main() {
-    let stations = Stations::new();
+    let stations = StationsManager::new();
 
     let matches = command!()
         .subcommand_required(true)
@@ -76,10 +76,6 @@ fn main() {
                         ),
                 ),
         )
-        .subcommand(
-            Command::new("refresh")
-                .about("Manually refresh the cache for station names (note: tst automatically refreshes every week)"),
-        )
         .get_matches();
 
     match matches.subcommand() {
@@ -135,10 +131,6 @@ fn main() {
                 println!("{station}");
             }
         }
-        Some(("refresh", _)) => match Stations::refresh() {
-            Ok(_) => println!("Successfully updated the cache for station names"),
-            Err(_) => println!("Unable to update the cache for station names"),
-        },
         Some(("extra", extra_matches)) => {
             let manager = match SeptaPlusPlusManager::new() {
                 Ok(man) => man,
