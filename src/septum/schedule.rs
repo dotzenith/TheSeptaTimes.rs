@@ -68,10 +68,10 @@ impl ToString for ScheduleDirection {
 
 impl ScheduleOuter {
     pub fn get(line: &str, direction: &ScheduleDirection, orig: &str, dest: &str) -> AnyResult<ScheduleOuter> {
-        let base_url = match env::var("SeptaPlusPlusURL") {
+        let base_url = match env::var("SeptumURL") {
             Ok(url) => url,
             Err(_) => {
-                eprintln!("SeptaPlusPlusURL unset, cannot use this endpoint otherwise");
+                eprintln!("SeptumURL unset, cannot use this endpoint otherwise");
                 std::process::exit(1)
             }
         };

@@ -46,17 +46,17 @@ pub struct LinesStationsInner {
 #[derive(Deserialize, Debug)]
 pub struct LineStations(pub Vec<LinesStationsInner>);
 
-pub struct SeptaPlusPlusManager {
+pub struct SeptumMisc {
     url: String,
     matcher: SkimMatcherV2,
 }
 
-impl SeptaPlusPlusManager {
+impl SeptumMisc {
     pub fn new() -> Result<Self> {
         let base_url =
-            env::var("SeptaPlusPlusURL").context("SeptaPlusPlusURL not set, cannot use these endpoints otherwise")?;
+            env::var("SeptumURL").context("SeptumURL not set, cannot use these endpoints otherwise")?;
 
-        Ok(SeptaPlusPlusManager {
+        Ok(SeptumMisc {
             url: base_url,
             matcher: SkimMatcherV2::default(),
         })

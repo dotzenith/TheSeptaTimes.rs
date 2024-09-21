@@ -1,10 +1,10 @@
-mod endpoints;
+mod septa;
+mod septum;
 mod stations;
 mod traits;
 
-use crate::endpoints::{
-    Arrivals, NextToArrive, ScheduleDirection, ScheduleMode, ScheduleOuter, SeptaPlusPlusManager, TrainSchedule,
-};
+use crate::septa::{Arrivals, NextToArrive, TrainSchedule};
+use crate::septum::{ScheduleDirection, ScheduleMode, ScheduleOuter, SeptumMisc};
 use crate::stations::StationsManager;
 use crate::traits::{PrettyPrint, PrettyPrintWithMode};
 use clap::{arg, command, value_parser, Command};
@@ -50,7 +50,7 @@ fn main() {
         .subcommand(Command::new("stations").about("Get all valid station names"))
         .subcommand(
             Command::new("extra")
-                .about("All of the extra endpoints added by SepatPlusPlus")
+                .about("All of the extra endpoints added by Septum")
                 .subcommand(
                     Command::new("schedule")
                         .about("Get Schedule from one station to another on a given line")
@@ -132,7 +132,7 @@ fn main() {
             }
         }
         Some(("extra", extra_matches)) => {
-            let manager = match SeptaPlusPlusManager::new() {
+            let manager = match SeptumMisc::new() {
                 Ok(man) => man,
                 Err(err) => {
                     eprintln!("{err}");
@@ -171,7 +171,7 @@ fn main() {
                 Some(("lines", _)) => match manager.get_lines() {
                     Ok(lines) => lines.print(),
                     Err(_) => {
-                        eprintln!("An error occurred while getting lines, please check your SeptaPlusPlus URL");
+                        eprintln!("An error occurred while getting lines, please check your Septum URL");
                         std::process::exit(1)
                     }
                 },
@@ -187,7 +187,7 @@ fn main() {
                             }
                         }
                         Err(_) => {
-                            eprintln!("An error occurred while getting station, please check your SeptaPlusPlus URL and inputs");
+                            eprintln!("An error occurred while getting station, please check your Septum URL and inputs");
                             std::process::exit(1)
                         }
                     }

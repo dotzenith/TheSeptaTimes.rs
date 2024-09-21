@@ -75,7 +75,7 @@ Commands:
   arrivals  Find the next arrivals at a given train station
   train     Track a given train
   stations  Get all valid station names
-  extra     All of the extra endpoints added by SepatPlusPlus
+  extra     All of the extra endpoints added by Septum
   help      Print this message or the help of the given subcommand(s)
 
 Options:
@@ -94,7 +94,7 @@ tst next '30th Street Station' 'North Philadelphia'
 ```sh
 tst next 'suburban' '30th'
 ```
-> Setting `SeptaPlusPlusURL` as seen [below](#-extra-commands-provided-by-septaplusplus) will help make the fuzzy matching more accurate, but it is optional
+> Setting `SeptumURL` as seen [below](#-extra-commands-provided-by-septum) will help make the fuzzy matching more accurate, but it is optional
 
 #### List the next 6 arrivals at a given train station:
 ```sh
@@ -111,13 +111,13 @@ tst train 9374
 tst stations
 ```
 
-### ❖ Extra commands provided by [SeptaPlusPlus](https://github.com/dotzenith/SeptaPlusPlus)
+### ❖ Extra commands provided by [Septum](https://github.com/dotzenith/Septum)
 
-These commands require endpoints provided by [SeptaPlusPlus](https://github.com/dotzenith/SeptaPlusPlus).
-`tst` requires the `SeptaPlusPlusURL` environment variable to be set like:
+These commands require endpoints provided by [Septum](https://github.com/dotzenith/Septum).
+`tst` requires the `SeptumURL` environment variable to be set like:
 
 ```sh
-export SeptaPlusPlusURL="https://septa.jawn.website/api"
+export SeptumURL="https://septum.jawn.website/api"
 ```
 
 #### Get all lines supported by the `tst extra schedule` command:
@@ -139,7 +139,7 @@ tst extra schedule TRE "Trenton" "Gray 30th Street" inbound weekday
 ---
 
 ## ❖ What's New? 
-0.8.0 - Use [SeptaPlusPlus](https://github.com/dotzenith/SeptaPlusPlus) for station caching and remove manual cache refresh
+0.9.0 - Conform to [Septum](https://github.com/dotzenith/Septum) rename
 
 ---
 
