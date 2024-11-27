@@ -85,7 +85,13 @@ impl StationsManager {
         let stations: Vec<String> = result
             .0
             .iter()
-            .map(|station| format!("{} ({})", station.parameter, station.station_name))
+            .map(|station| {
+                if station.parameter == station.station_name {
+                    station.parameter.to_owned()
+                } else {
+                    format!("{} ({})", station.parameter, station.station_name)
+                }
+            })
             .collect();
         Ok(stations)
     }
@@ -135,13 +141,13 @@ impl StationsManager {
 const SECONDS_IN_WEEK: u64 = 604800;
 
 const FALLBACK_STATIONS: [&'static str; 154] = [
-    "9th St (9th Street Station)",
-    "30th Street Station",
+    "9th St (9th Street)",
+    "30th Street Station (30th Street)",
     "49th St (49th Street)",
     "Airport Terminal A",
     "Airport Terminal B",
-    "Airport Terminal C-D (Airport Terminal C & D)",
-    "Airport Terminal E-F (Airport Terminal E & F)",
+    "Airport Terminal C-D",
+    "Airport Terminal E-F",
     "Allegheny",
     "Allen Lane",
     "Ambler",
@@ -161,8 +167,8 @@ const FALLBACK_STATIONS: [&'static str; 154] = [
     "Chester TC (Chester Transportation Center)",
     "Chestnut Hill East",
     "Chestnut Hill West",
-    "Churchmans Crossing",
-    "Claymont",
+    "Churchmans Crossing (Churchmans Crossing, DE)",
+    "Claymont (Claymont, DE)",
     "Clifton-Aldan",
     "Colmar",
     "Conshohocken",
@@ -172,22 +178,22 @@ const FALLBACK_STATIONS: [&'static str; 154] = [
     "Crum Lynne",
     "Curtis Park",
     "Cynwyd",
-    "Darby",
     "Daylesford",
+    "Darby",
     "Delaware Valley College",
     "Devon",
     "Downingtown",
     "Doylestown",
     "East Falls",
-    "Eastwick Station",
+    "Eastwick Station (Eastwick)",
     "Eddington",
     "Eddystone",
     "Elkins Park",
-    "Elm St (Elm Street, Norristown)",
+    "Elm St (Elm Street-Norristown)",
     "Elwyn Station (Elwyn)",
     "Exton",
     "Fern Rock TC (Fern Rock Transportation Center)",
-    "Fernwood (Fernwood–Yeadon)",
+    "Fernwood (Fernwood-Yeadon)",
     "Folcroft",
     "Forest Hills",
     "Ft Washington (Fort Washington)",
@@ -201,11 +207,11 @@ const FALLBACK_STATIONS: [&'static str; 154] = [
     "Gwynedd Valley",
     "Hatboro",
     "Haverford",
-    "Highland",
     "Highland Ave (Highland Avenue)",
+    "Highland",
     "Holmesburg Jct (Holmesburg Junction)",
     "Ivy Ridge",
-    "Market East (Jefferson Station (Market East))",
+    "Jefferson Station",
     "Jenkintown-Wyncote",
     "Langhorne",
     "Lansdale",
@@ -213,7 +219,7 @@ const FALLBACK_STATIONS: [&'static str; 154] = [
     "Lawndale",
     "Levittown",
     "Link Belt",
-    "Main St (Main Street, Norristown)",
+    "Main St (Main Street-Norristown)",
     "Malvern",
     "Manayunk",
     "Marcus Hook",
@@ -223,13 +229,13 @@ const FALLBACK_STATIONS: [&'static str; 154] = [
     "Merion",
     "Miquon",
     "Morton",
-    "Mt Airy (Mount Airy)",
     "Moylan-Rose Valley",
+    "Mt Airy (Mt. Airy)",
     "Narberth",
     "Neshaminy Falls",
     "New Britain",
-    "Newark",
-    "Noble",
+    "Newark (Newark Station)",
+    "Noble (Noble Station)",
     "Norristown TC (Norristown Transportation Center)",
     "North Broad St (North Broad)",
     "North Hills",
@@ -276,12 +282,13 @@ const FALLBACK_STATIONS: [&'static str; 154] = [
     "Wallingford",
     "Warminster",
     "Washington Lane",
-    "Wayne",
+    "Wawa",
     "Wayne Jct (Wayne Junction)",
-    "West Trenton",
+    "Wayne Station (Wayne)",
+    "West Trenton (West Trenton, NJ)",
     "Whitford",
     "Willow Grove",
-    "Wilmington",
+    "Wilmington (Wilmington, DE)",
     "Wissahickon",
     "Wister",
     "Woodbourne",
