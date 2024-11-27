@@ -139,7 +139,7 @@ tst extra schedule TRE "Trenton" "Gray 30th Street" inbound weekday
 ---
 
 ## ❖ What's New? 
-0.9.0 - Conform to [Septum](https://github.com/dotzenith/Septum) rename
+0.9.1 - Updated the fallback for next-to-arrive station names
 
 ---
 
