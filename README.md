@@ -35,13 +35,12 @@ curl --proto '=https' --tlsv1.2 -LsSf https://github.com/dotzenith/TheSeptaTimes
 
 #### Brew
 ```sh
-brew tap dotzenith/tap
-brew install the-septa-times
+brew install dotzenith/tap/the-septa-times
 ```
 
 #### Powershell
 ```sh
-irm https://github.com/dotzenith/TheSeptaTimes.rs/releases/latest/download/the-septa-times-installer.ps1 | iex
+powershell -ExecutionPolicy ByPass -c "irm https://github.com/dotzenith/TheSeptaTimes.rs/releases/latest/download/the-septa-times-installer.ps1 | iex"
 ```
 
 #### Cargo
