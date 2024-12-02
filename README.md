@@ -138,7 +138,8 @@ tst extra schedule TRE "Trenton" "Gray 30th Street" inbound weekday
 ---
 
 ## ❖ What's New? 
-0.9.1 - Updated the fallback for next-to-arrive station names
+
+0.9.2 - Updates to rust-toolchain version
 
 ---
 
