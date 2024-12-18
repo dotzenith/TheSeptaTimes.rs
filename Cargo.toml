@@ -1,8 +1,8 @@
 [package]
 name = "the-septa-times"
-version = "0.9.2"
+version = "0.9.3"
 edition = "2021"
-description = "A CLI application for the SEPTA API"
+description = "A SEPTA app for the terminal"
 homepage = "https://github.com/dotzenith/TheSeptaTimes.rs"
 repository = "https://github.com/dotzenith/TheSeptaTimes.rs"
 license = "MIT"
@@ -11,8 +11,6 @@ autobins = false
 [[bin]]
 name = "tst"
 path = "src/main.rs"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 colored = "2"

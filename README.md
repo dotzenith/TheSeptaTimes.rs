@@ -139,7 +139,7 @@ tst extra schedule TRE "Trenton" "Gray 30th Street" inbound weekday
 
 ## ❖ What's New? 
 
-0.9.2 - Updates to rust-toolchain version
+0.9.3 - Updates to rust-toolchain version
 
 ---
 
