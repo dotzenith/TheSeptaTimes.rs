@@ -20,8 +20,8 @@ fn main() {
         .subcommand(
             Command::new("next")
                 .about("Search for the next train going from an origin to a destination")
-                .arg(arg!(from: [STATION]))
-                .arg(arg!(to: [STATION]))
+                .arg(arg!(from: <STATION>))
+                .arg(arg!(to: <STATION>))
                 .arg(
                     arg!(--count <NUM>)
                         .value_parser(value_parser!(u8))
@@ -33,7 +33,7 @@ fn main() {
         .subcommand(
             Command::new("arrivals")
                 .about("Find the next arrivals at a given train station")
-                .arg(arg!(station: [STATION]))
+                .arg(arg!(station: <STATION>))
                 .arg(
                     arg!(--count <NUM>)
                         .value_parser(value_parser!(u8))
@@ -45,7 +45,7 @@ fn main() {
         .subcommand(
             Command::new("train")
                 .about("Track a given train")
-                .arg(arg!(number: [TRAIN_NUM])),
+                .arg(arg!(number: <TRAIN_NUM>)),
         )
         .subcommand(Command::new("stations").about("Get all valid station names"))
         .subcommand(
@@ -54,9 +54,9 @@ fn main() {
                 .subcommand(
                     Command::new("schedule")
                         .about("Get Schedule from one station to another on a given line")
-                        .arg(arg!(line: [LINE]).help("The Regional Rail Line Code (e.g, TRE)"))
-                        .arg(arg!(orig: [ORIG]).help("Starting Station (e.g, Trenton)"))
-                        .arg(arg!(dest: [DEST]).help("Ending Station (e.g, Gray 30th Street)"))
+                        .arg(arg!(line: <LINE>).help("The Regional Rail Line Code (e.g, TRE)"))
+                        .arg(arg!(orig: <ORIG>).help("Starting Station (e.g, Trenton)"))
+                        .arg(arg!(dest: <DEST>).help("Ending Station (e.g, Gray 30th Street)"))
                         .arg(arg!(direction: [inbound_or_outbound]).value_parser(value_parser!(ScheduleDirection)))
                         .arg(arg!(mode: [weekend_or_weekday]).value_parser(value_parser!(ScheduleMode))),
                 )
@@ -66,7 +66,7 @@ fn main() {
                 .subcommand(
                     Command::new("stations")
                         .about("Get all of the stations for a given line")
-                        .arg(arg!(line: [LINE]).help("The Regional Rail Line Code (e.g, TRE)"))
+                        .arg(arg!(line: <LINE>).help("The Regional Rail Line Code (e.g, TRE)"))
                         .arg(
                             arg!(--direction <inbound_or_outbound>)
                                 .value_parser(value_parser!(ScheduleDirection))
