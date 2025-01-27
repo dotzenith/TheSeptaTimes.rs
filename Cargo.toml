@@ -1,6 +1,6 @@
 [package]
 name = "the-septa-times"
-version = "0.9.5"
+version = "0.9.6"
 edition = "2021"
 description = "A SEPTA app for the terminal"
 homepage = "https://github.com/dotzenith/TheSeptaTimes.rs"
@@ -20,7 +20,7 @@ platform-dirs = "0.3.0"
 fuzzy-matcher = "0.3.7"
 clap = { version = "4.4.9", features = ["cargo"] }
 serde = { version = "1.0.192", features = ["derive"] }
-ureq = "3.0.0"
+ureq = { version = "3.0.1", features = ["json"] }
 url = "2.5.4"
 
 [profile.release]
