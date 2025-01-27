@@ -187,7 +187,9 @@ fn main() {
                             }
                         }
                         Err(_) => {
-                            eprintln!("An error occurred while getting station, please check your Septum URL and inputs");
+                            eprintln!(
+                                "An error occurred while getting station, please check your Septum URL and inputs"
+                            );
                             std::process::exit(1)
                         }
                     }

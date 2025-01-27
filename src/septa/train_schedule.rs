@@ -2,8 +2,8 @@ use crate::traits::{Parse, PrettyPrint};
 use crate::URL;
 use anyhow::Result;
 use colored::Colorize;
-use reqwest::blocking::get;
 use serde::Deserialize;
+use url::Url;
 
 #[allow(dead_code)]
 #[derive(Deserialize)]
@@ -19,8 +19,8 @@ pub struct TrainSchedule(pub Vec<TrainScheduleInner>);
 
 impl TrainSchedule {
     pub fn get(num: &str) -> Result<TrainSchedule> {
-        let request_url = format!("{}/RRSchedules/index.php?req1={}", URL, num);
-        let result: TrainSchedule = get(request_url)?.json()?;
+        let request_url = Url::parse(&format!("{}/RRSchedules/index.php?req1={}", URL, num))?;
+        let result: TrainSchedule = ureq::get(request_url.as_ref()).call()?.body_mut().read_json()?;
         Ok(result)
     }
 }

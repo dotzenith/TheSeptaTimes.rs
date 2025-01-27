@@ -2,8 +2,8 @@ use crate::traits::{Parse, PrettyPrint};
 use crate::URL;
 use anyhow::Result;
 use colored::Colorize;
-use reqwest::blocking::get;
 use serde::Deserialize;
+use url::Url;
 
 #[derive(Deserialize)]
 pub struct NextToArriveInner {
@@ -26,8 +26,11 @@ pub struct NextToArrive(pub Vec<NextToArriveInner>);
 
 impl NextToArrive {
     pub fn get(from: &str, to: &str, num: u8) -> Result<NextToArrive> {
-        let request_url = format!("{}/NextToArrive/index.php?req1={}&req2={}&req3={}", URL, from, to, num,);
-        let result: NextToArrive = get(request_url)?.json()?;
+        let request_url = Url::parse(&format!(
+            "{}/NextToArrive/index.php?req1={}&req2={}&req3={}",
+            URL, from, to, num,
+        ))?;
+        let result: NextToArrive = ureq::get(request_url.as_ref()).call()?.body_mut().read_json()?;
         Ok(result)
     }
 }

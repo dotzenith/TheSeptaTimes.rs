@@ -1,10 +1,10 @@
 use crate::traits::{ParseWithMode, PrettyPrintWithMode};
 use anyhow::Result as AnyResult;
 use colored::Colorize;
-use reqwest::blocking::get;
 use serde::Deserialize;
 use std::env;
 use std::str::FromStr;
+use url::Url;
 
 #[allow(dead_code)]
 #[derive(Deserialize, Debug)]
@@ -75,11 +75,15 @@ impl ScheduleOuter {
                 std::process::exit(1)
             }
         };
-        let request_url = format!(
+        let request_url = Url::parse(&format!(
             "{}/schedule?line={}&direction={}&orig={}&dest={}",
-            base_url, line, direction.to_string(), orig, dest
-        );
-        let result: ScheduleOuter = get(request_url)?.json()?;
+            base_url,
+            line,
+            direction.to_string(),
+            orig,
+            dest
+        ))?;
+        let result: ScheduleOuter = ureq::get(request_url.as_ref()).call()?.body_mut().read_json()?;
         Ok(result)
     }
 }

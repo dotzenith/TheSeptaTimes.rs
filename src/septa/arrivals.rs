@@ -2,9 +2,9 @@ use crate::traits::{Parse, PrettyPrint};
 use crate::URL;
 use anyhow::Result;
 use colored::Colorize;
-use reqwest::blocking::get;
 use serde::Deserialize;
 use std::collections::HashMap;
+use url::Url;
 
 #[allow(dead_code)]
 #[derive(Deserialize)]
@@ -31,8 +31,8 @@ pub struct Arrivals(pub HashMap<String, Vec<HashMap<String, Vec<ArrivalsInner>>>
 
 impl Arrivals {
     pub fn get(name: &str, num: u8) -> Result<Arrivals> {
-        let request_url = format!("{}/Arrivals/index.php?station={}&results={}", URL, name, num,);
-        let result: Arrivals = get(request_url)?.json()?;
+        let request_url = Url::parse(&format!("{}/Arrivals/index.php?station={}&results={}", URL, name, num))?;
+        let result: Arrivals = ureq::get(request_url.as_ref()).call()?.body_mut().read_json()?;
         Ok(result)
     }
 }

@@ -81,7 +81,10 @@ impl StationsManager {
 
     fn fetch_stations_from_api() -> Result<Vec<String>> {
         let base_url = env::var("SeptumURL").context("SeptumURL not set, cannot fetch stations")?;
-        let result: Stations = reqwest::blocking::get(format!("{}/stations", base_url))?.json()?;
+        let result: Stations = ureq::get(format!("{}/stations", base_url))
+            .call()?
+            .body_mut()
+            .read_json()?;
         let stations: Vec<String> = result
             .0
             .iter()

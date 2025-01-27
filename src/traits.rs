@@ -1,4 +1,4 @@
-use  crate::ScheduleMode;
+use crate::ScheduleMode;
 
 pub trait Parse {
     fn parse(&self) -> Vec<String>;

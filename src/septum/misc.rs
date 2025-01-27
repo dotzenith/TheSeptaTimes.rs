@@ -4,9 +4,9 @@ use anyhow::{anyhow, Context, Result};
 use colored::Colorize;
 use fuzzy_matcher::skim::SkimMatcherV2;
 use fuzzy_matcher::FuzzyMatcher;
-use reqwest::blocking::get;
 use serde::Deserialize;
 use std::env;
+use url::Url;
 
 #[allow(dead_code)]
 #[derive(Deserialize, Debug)]
@@ -53,8 +53,7 @@ pub struct SeptumMisc {
 
 impl SeptumMisc {
     pub fn new() -> Result<Self> {
-        let base_url =
-            env::var("SeptumURL").context("SeptumURL not set, cannot use these endpoints otherwise")?;
+        let base_url = env::var("SeptumURL").context("SeptumURL not set, cannot use these endpoints otherwise")?;
 
         Ok(SeptumMisc {
             url: base_url,
@@ -64,18 +63,18 @@ impl SeptumMisc {
 
     pub fn get_lines(&self) -> Result<Lines> {
         let request_url = format!("{}/schedule/lines", &self.url);
-        let result: Lines = get(request_url)?.json()?;
+        let result: Lines = ureq::get(request_url).call()?.body_mut().read_json()?;
         Ok(result)
     }
 
     pub fn get_stations_for_line(&self, line: &str, direction: &ScheduleDirection) -> Result<Vec<String>> {
-        let request_url = format!(
+        let request_url = Url::parse(&format!(
             "{}/schedule/stations?line={}&direction={}",
             self.url,
             line,
             direction.to_string()
-        );
-        let result: LineStations = get(request_url)?.json()?;
+        ))?;
+        let result: LineStations = ureq::get(request_url.as_ref()).call()?.body_mut().read_json()?;
         let stations: Vec<String> = result.0.into_iter().map(|item| item.stop_name).collect();
         Ok(stations)
     }
@@ -85,13 +84,13 @@ impl SeptumMisc {
         search: &str,
         direction: &ScheduleDirection,
     ) -> Result<String> {
-        let request_url = format!(
+        let request_url = Url::parse(&format!(
             "{}/schedule/stations?line={}&direction={}",
             self.url,
             line,
             direction.to_string()
-        );
-        let result: LineStations = get(request_url)?.json()?;
+        ))?;
+        let result: LineStations = ureq::get(request_url.as_ref()).call()?.body_mut().read_json()?;
         let stations: Vec<String> = result.0.into_iter().map(|item| item.stop_name).collect();
         let results: Vec<i64> = stations
             .iter()

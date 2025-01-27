@@ -139,7 +139,7 @@ tst extra schedule TRE "Trenton" "Gray 30th Street" inbound weekday
 
 ## ❖ What's New? 
 
-0.9.4 - Fix subcommand arguments
+0.9.5 - Use `ureq` instead of `reqwest::blocking`
 
 ---
 
