@@ -22,7 +22,7 @@
 
 TheSeptaTimes.rs is an easy-to-use commandline utility to fetch information about regional SEPTA trains
 
-  <img src="https://github.com/dotzenith/dotzenith/blob/main/assets/TheSeptaTimes/septa.gif" alt="septa gif">
+  <img src="https://assets.danshu.co/TheSeptaTimes/septa.gif" alt="septa gif">
 
 ---
 
