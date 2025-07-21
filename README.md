@@ -139,7 +139,7 @@ tst extra schedule TRE "Trenton" "Gray 30th Street" inbound weekday
 
 ## ❖ What's New? 
 
-0.9.7 - Update rust edition to 2024
+0.9.8 - Bump Rust version
 
 ---
 
