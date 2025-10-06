@@ -1,5 +1,5 @@
-use crate::traits::{Parse, PrettyPrint};
 use crate::URL;
+use crate::traits::{Parse, PrettyPrint};
 use anyhow::Result;
 use colored::Colorize;
 use serde::Deserialize;

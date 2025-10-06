@@ -1,9 +1,9 @@
 use super::ScheduleDirection;
 use crate::traits::{Parse, PrettyPrint};
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use colored::Colorize;
-use fuzzy_matcher::skim::SkimMatcherV2;
 use fuzzy_matcher::FuzzyMatcher;
+use fuzzy_matcher::skim::SkimMatcherV2;
 use serde::Deserialize;
 use std::env;
 use url::Url;

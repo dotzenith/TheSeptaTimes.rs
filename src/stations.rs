@@ -1,12 +1,12 @@
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use bincode::{deserialize_from, serialize_into};
-use fuzzy_matcher::skim::SkimMatcherV2;
 use fuzzy_matcher::FuzzyMatcher;
+use fuzzy_matcher::skim::SkimMatcherV2;
 use platform_dirs::AppDirs;
 use serde::Deserialize;
 use std::env;
 use std::fs;
-use std::fs::{create_dir, OpenOptions};
+use std::fs::{OpenOptions, create_dir};
 use std::io::{BufReader, BufWriter};
 use std::time::SystemTime;
 
