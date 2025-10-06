@@ -1,6 +1,6 @@
 [package]
 name = "the-septa-times"
-version = "0.9.9"
+version = "0.9.10"
 edition = "2024"
 description = "A SEPTA app for the terminal"
 homepage = "https://github.com/dotzenith/TheSeptaTimes.rs"
