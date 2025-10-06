@@ -47,9 +47,26 @@ pub fn parse_time(time: Option<&str>) -> String {
     let minute = time_vec[1].parse::<u8>().unwrap_or(0);
     let mut meridian = "AM";
 
-    if hour > 12 {
-        hour -= 12;
-        meridian = "PM";
+    // Look, this time handling was super crude to begin with
+    // But septa also believes there are more than 24 hours in
+    // a day, so here we are
+    match hour {
+        12 => {
+            meridian = "PM";
+        }
+        13..=23 => {
+            meridian = "PM";
+            hour -= 12;
+        }
+        24 => {
+            meridian = "AM";
+            hour -= 12;
+        }
+        25..36 => {
+            meridian = "AM";
+            hour -= 24;
+        }
+        _ => (),
     }
     format!("{:02}:{:02} {}", hour, minute, meridian)
 }
