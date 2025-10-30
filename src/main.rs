@@ -32,7 +32,7 @@ enum Commands {
         to: String,
 
         /// Number of results to return
-        #[arg(long, default_value = "5")]
+        #[arg(long, short, default_value = "5")]
         count: u8,
     },
 
@@ -42,7 +42,7 @@ enum Commands {
         station: String,
 
         /// Number of results to return
-        #[arg(long, default_value = "5")]
+        #[arg(long, short, default_value = "5")]
         count: u8,
     },
 
@@ -76,9 +76,11 @@ enum ExtraCommands {
         dest: String,
 
         /// Direction (inbound or outbound)
+        #[arg(long, short, default_value = "inbound")]
         direction: ScheduleDirection,
 
         /// Mode (weekend or weekday)
+        #[arg(long, short, default_value = "weekday")]
         mode: ScheduleMode,
     },
 
@@ -91,7 +93,7 @@ enum ExtraCommands {
         line: String,
 
         /// Direction (inbound or outbound)
-        #[arg(long, default_value = "inbound")]
+        #[arg(long, short, default_value = "inbound")]
         direction: ScheduleDirection,
     },
 }
