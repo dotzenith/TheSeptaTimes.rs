@@ -139,7 +139,7 @@ tst extra schedule TRE "Trenton" "Gray 30th Street" inbound weekday
 
 ## ❖ What's New? 
 
-0.10.0 - Cleaner interface for `tst extra schedule`
+0.10.1 - Cleaner interface for `tst extra schedule`
 
 ---
 
