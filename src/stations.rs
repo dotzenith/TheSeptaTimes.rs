@@ -1,7 +1,6 @@
 use anyhow::{Context, Result, anyhow};
 use bincode::{deserialize_from, serialize_into};
-use fuzzy_matcher::FuzzyMatcher;
-use fuzzy_matcher::skim::SkimMatcherV2;
+use nucleo_matcher::{Config, Matcher, pattern};
 use platform_dirs::AppDirs;
 use serde::Deserialize;
 use std::env;
@@ -12,7 +11,7 @@ use std::time::SystemTime;
 
 pub struct StationsManager {
     stations: Vec<String>,
-    matcher: SkimMatcherV2,
+    matcher: Matcher,
 }
 
 #[allow(dead_code)]
@@ -29,7 +28,7 @@ impl StationsManager {
     pub fn new() -> Self {
         let mut manager = StationsManager {
             stations: Vec::new(),
-            matcher: SkimMatcherV2::default(),
+            matcher: Matcher::new(Config::DEFAULT),
         };
         manager.stations = match Self::get_stations_from_file_or_api() {
             Ok(stations) => stations,
@@ -42,26 +41,24 @@ impl StationsManager {
         &self.stations
     }
 
-    pub fn fuzzy_search(&self, search: &str) -> Result<&str> {
-        let results: Vec<i64> = self
-            .stations
-            .iter()
-            .map(|station| self.matcher.fuzzy_match(station, search).unwrap_or(0))
-            .collect();
+    pub fn fuzzy_search(&mut self, search: &str) -> Result<String> {
+        let matches = pattern::Atom::new(
+            search,
+            pattern::CaseMatching::Ignore,
+            pattern::Normalization::Smart,
+            pattern::AtomKind::Fuzzy,
+            false,
+        )
+        .match_list(&self.stations, &mut self.matcher);
 
-        if results.iter().sum::<i64>() == 0 {
+        if matches.len() == 0 {
             return Err(anyhow!("No matching value"));
         }
 
-        let mut station: &str = &self.stations[results
-            .iter()
-            .enumerate()
-            .max_by(|(_, a), (_, b)| a.cmp(b))
-            .map(|(index, _)| index)
-            .context("Could not get the index of matching value")?];
+        let mut station = matches[0].0.to_owned();
 
         match station.split_once('(') {
-            Some((first, _)) => station = first.trim(),
+            Some((first, _)) => station = first.trim().to_owned(),
             None => (),
         }
 

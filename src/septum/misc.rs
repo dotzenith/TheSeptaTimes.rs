@@ -1,9 +1,8 @@
 use super::ScheduleDirection;
 use crate::traits::{Parse, PrettyPrint};
+use nucleo_matcher::{Config, Matcher, pattern};
 use anyhow::{Context, Result, anyhow};
 use colored::Colorize;
-use fuzzy_matcher::FuzzyMatcher;
-use fuzzy_matcher::skim::SkimMatcherV2;
 use serde::Deserialize;
 use std::env;
 use url::Url;
@@ -48,7 +47,7 @@ pub struct LineStations(pub Vec<LinesStationsInner>);
 
 pub struct SeptumMisc {
     url: String,
-    matcher: SkimMatcherV2,
+    matcher: Matcher,
 }
 
 impl SeptumMisc {
@@ -57,7 +56,7 @@ impl SeptumMisc {
 
         Ok(SeptumMisc {
             url: base_url,
-            matcher: SkimMatcherV2::default(),
+            matcher: Matcher::new(Config::DEFAULT),
         })
     }
 
@@ -79,7 +78,7 @@ impl SeptumMisc {
         Ok(stations)
     }
     pub fn fuzzy_match_station_for_line(
-        &self,
+        &mut self,
         line: &str,
         search: &str,
         direction: &ScheduleDirection,
@@ -92,22 +91,22 @@ impl SeptumMisc {
         ))?;
         let result: LineStations = ureq::get(request_url.as_ref()).call()?.body_mut().read_json()?;
         let stations: Vec<String> = result.0.into_iter().map(|item| item.stop_name).collect();
-        let results: Vec<i64> = stations
-            .iter()
-            .map(|station| self.matcher.fuzzy_match(station, search).unwrap_or(0))
-            .collect();
 
-        if results.iter().sum::<i64>() == 0 {
+        let matches = pattern::Atom::new(
+            search,
+            pattern::CaseMatching::Ignore,
+            pattern::Normalization::Smart,
+            pattern::AtomKind::Fuzzy,
+            false,
+        )
+        .match_list(&stations, &mut self.matcher);
+
+        if matches.len() == 0 {
             return Err(anyhow!("No matching value"));
         }
 
-        let station: &str = &stations[results
-            .iter()
-            .enumerate()
-            .max_by(|(_, a), (_, b)| a.cmp(b))
-            .map(|(index, _)| index)
-            .context("Could not get the index of matching value")?];
+        let station = matches[0].0.to_owned();
 
-        Ok(station.to_string())
+        Ok(station)
     }
 }

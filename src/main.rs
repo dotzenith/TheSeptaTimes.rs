@@ -99,7 +99,7 @@ enum ExtraCommands {
 }
 
 fn main() {
-    let stations = StationsManager::new();
+    let mut stations = StationsManager::new();
     let cli = Cli::parse();
 
     match cli.command {
@@ -108,7 +108,7 @@ fn main() {
                 eprintln!("Invalid station, please use `tst stations` for all valid station names");
                 std::process::exit(1)
             }
-            (Ok(matching_start), Ok(matching_end)) => match NextToArrive::get(matching_start, matching_end, count) {
+            (Ok(matching_start), Ok(matching_end)) => match NextToArrive::get(&matching_start, &matching_end, count) {
                 Ok(next) => next.print(),
                 Err(err) => {
                     eprintln!("An error occurred while getting next trains: {:?}", err);
@@ -117,7 +117,7 @@ fn main() {
             },
         },
         Commands::Arrivals { station, count } => match stations.fuzzy_search(&station) {
-            Ok(matching_station) => match Arrivals::get(matching_station, count) {
+            Ok(matching_station) => match Arrivals::get(&matching_station, count) {
                 Ok(arr) => arr.print(),
                 Err(err) => {
                     eprintln!("An error occurred while getting arrivals: {:?}", err);
@@ -142,7 +142,7 @@ fn main() {
             }
         }
         Commands::Extra { command } => {
-            let manager = match SeptumMisc::new() {
+            let mut manager = match SeptumMisc::new() {
                 Ok(man) => man,
                 Err(err) => {
                     eprintln!("{err}");
