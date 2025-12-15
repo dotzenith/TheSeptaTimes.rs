@@ -5,7 +5,7 @@ use nucleo_matcher::{Config, Matcher, pattern};
 use serde::Deserialize;
 use std::env;
 use std::fs;
-use std::fs::{OpenOptions, create_dir};
+use std::fs::{OpenOptions, create_dir_all};
 use std::io::{BufReader, BufWriter};
 use std::time::SystemTime;
 
@@ -99,7 +99,7 @@ impl StationsManager {
     fn save_stations_to_file(stations: &Vec<String>) -> Result<()> {
         let app_dir = ProjectDirs::from("com", "dotzenith", "TheSeptaTimes").ok_or(anyhow!("Unable to get AppDirs"))?;
         if !app_dir.cache_dir().exists() {
-            create_dir(&app_dir.cache_dir())?;
+            create_dir_all(&app_dir.cache_dir())?;
         }
 
         let mut file = BufWriter::new(
