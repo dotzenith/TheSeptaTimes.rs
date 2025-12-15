@@ -1,8 +1,8 @@
 use super::ScheduleDirection;
 use crate::traits::{Parse, PrettyPrint};
-use nucleo_matcher::{Config, Matcher, pattern};
 use anyhow::{Context, Result, anyhow};
 use colored::Colorize;
+use nucleo_matcher::{Config, Matcher, pattern};
 use serde::Deserialize;
 use std::env;
 use url::Url;

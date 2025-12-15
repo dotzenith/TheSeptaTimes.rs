@@ -1,7 +1,7 @@
 use anyhow::{Context, Result, anyhow};
 use bincode::{deserialize_from, serialize_into};
+use directories::ProjectDirs;
 use nucleo_matcher::{Config, Matcher, pattern};
-use platform_dirs::AppDirs;
 use serde::Deserialize;
 use std::env;
 use std::fs;
@@ -97,9 +97,9 @@ impl StationsManager {
     }
 
     fn save_stations_to_file(stations: &Vec<String>) -> Result<()> {
-        let app_dirs = AppDirs::new(Some("TheSeptaTimes"), true).context("Unable to get AppDirs")?;
-        if !app_dirs.cache_dir.exists() {
-            create_dir(&app_dirs.cache_dir)?;
+        let app_dir = ProjectDirs::from("com", "dotzenith", "TheSeptaTimes").ok_or(anyhow!("Unable to get AppDirs"))?;
+        if !app_dir.cache_dir().exists() {
+            create_dir(&app_dir.cache_dir())?;
         }
 
         let mut file = BufWriter::new(
@@ -107,7 +107,7 @@ impl StationsManager {
                 .write(true)
                 .create(true)
                 .truncate(true)
-                .open(app_dirs.cache_dir.join("stations"))?,
+                .open(app_dir.cache_dir().join("stations"))?,
         );
 
         serialize_into(&mut file, stations)?;
@@ -115,9 +115,9 @@ impl StationsManager {
     }
 
     fn read_stations_from_file() -> Result<Vec<String>> {
-        let app_dirs = AppDirs::new(Some("TheSeptaTimes"), true).context("Unable to get AppDirs")?;
+        let app_dir = ProjectDirs::from("com", "dotzenith", "TheSeptaTimes").ok_or(anyhow!("Unable to get AppDirs"))?;
 
-        let metadata = fs::metadata(app_dirs.cache_dir.join("stations"))?;
+        let metadata = fs::metadata(app_dir.cache_dir().join("stations"))?;
         let time = metadata.modified().context("Unsupported platform")?;
         let diff = SystemTime::now()
             .duration_since(time)
@@ -130,7 +130,7 @@ impl StationsManager {
         let mut f = BufReader::new(
             OpenOptions::new()
                 .read(true)
-                .open(app_dirs.cache_dir.join("stations"))?,
+                .open(app_dir.cache_dir().join("stations"))?,
         );
 
         let stations: Vec<String> = deserialize_from(&mut f)?;
