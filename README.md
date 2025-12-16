@@ -139,7 +139,7 @@ tst extra schedule TRE "Trenton" "Gray 30th Street" inbound weekday
 
 ## ❖ What's New? 
 
-0.10.2 - Fix cache implementation
+0.10.3 - Updates to fuzzy matching
 
 ---
 
