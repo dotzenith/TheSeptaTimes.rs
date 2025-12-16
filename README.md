@@ -141,7 +141,7 @@ to get the schedule you'd like
 
 ## ❖ What's New? 
 
-0.10.3 - Updates to fuzzy matching
+0.11.0 - Cleaner interface for `tst extra schedule`
 
 ---
 
