@@ -75,13 +75,21 @@ enum ExtraCommands {
         /// Ending Station (e.g, Gray 30th Street)
         dest: String,
 
-        /// Direction (inbound or outbound)
-        #[arg(long, short, default_value = "inbound")]
-        direction: ScheduleDirection,
+        /// Trains going inbound
+        #[arg(long, group = "direction")]
+        inbound: bool,
 
-        /// Mode (weekend or weekday)
-        #[arg(long, short, default_value = "weekday")]
-        mode: ScheduleMode,
+        /// Trains going outbound
+        #[arg(long, group = "direction")]
+        outbound: bool,
+
+        /// Weekday trains
+        #[arg(long, group = "week")]
+        weekday: bool,
+
+        /// Weekend trains
+        #[arg(long, group = "week")]
+        weekend: bool,
     },
 
     /// Get all of the lines supported by the extra schedules endpoint
@@ -92,9 +100,13 @@ enum ExtraCommands {
         /// The Regional Rail Line Code (e.g, TRE)
         line: String,
 
-        /// Direction (inbound or outbound)
-        #[arg(long, short, default_value = "inbound")]
-        direction: ScheduleDirection,
+        /// Trains going inbound
+        #[arg(long, group = "direction")]
+        inbound: bool,
+
+        /// Trains going outbound
+        #[arg(long, group = "direction")]
+        outbound: bool,
     },
 }
 
@@ -155,9 +167,27 @@ fn main() {
                     line,
                     orig,
                     dest,
-                    direction,
-                    mode,
+                    inbound,
+                    outbound,
+                    weekday,
+                    weekend,
                 } => {
+                    let direction = if inbound {
+                        ScheduleDirection::Inbound
+                    } else if outbound {
+                        ScheduleDirection::Outbound
+                    } else {
+                        ScheduleDirection::Inbound
+                    };
+
+                    let mode = if weekday {
+                        ScheduleMode::Weekday
+                    } else if weekend {
+                        ScheduleMode::Weekend
+                    } else {
+                        ScheduleMode::Weekday
+                    };
+
                     match (
                         manager.fuzzy_match_station_for_line(&line, &orig, &direction),
                         manager.fuzzy_match_station_for_line(&line, &dest, &direction),
@@ -188,17 +218,33 @@ fn main() {
                         std::process::exit(1)
                     }
                 },
-                ExtraCommands::Stations { line, direction } => match manager.get_stations_for_line(&line, &direction) {
-                    Ok(stations) => {
-                        for station in stations.iter() {
-                            println!("{station}");
+                ExtraCommands::Stations {
+                    line,
+                    inbound,
+                    outbound,
+                } => {
+                    let direction = if inbound {
+                        ScheduleDirection::Inbound
+                    } else if outbound {
+                        ScheduleDirection::Outbound
+                    } else {
+                        ScheduleDirection::Inbound
+                    };
+
+                    match manager.get_stations_for_line(&line, &direction) {
+                        Ok(stations) => {
+                            for station in stations.iter() {
+                                println!("{station}");
+                            }
+                        }
+                        Err(_) => {
+                            eprintln!(
+                                "An error occurred while getting station, please check your Septum URL and inputs"
+                            );
+                            std::process::exit(1)
                         }
                     }
-                    Err(_) => {
-                        eprintln!("An error occurred while getting station, please check your Septum URL and inputs");
-                        std::process::exit(1)
-                    }
-                },
+                }
             }
         }
     }
