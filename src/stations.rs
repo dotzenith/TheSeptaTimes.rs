@@ -42,12 +42,11 @@ impl StationsManager {
     }
 
     pub fn fuzzy_search(&mut self, search: &str) -> Result<String> {
-        let matches = pattern::Atom::new(
+        let matches = pattern::Pattern::new(
             search,
             pattern::CaseMatching::Ignore,
             pattern::Normalization::Smart,
             pattern::AtomKind::Fuzzy,
-            false,
         )
         .match_list(&self.stations, &mut self.matcher);
 

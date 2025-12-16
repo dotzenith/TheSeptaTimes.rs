@@ -92,12 +92,11 @@ impl SeptumMisc {
         let result: LineStations = ureq::get(request_url.as_ref()).call()?.body_mut().read_json()?;
         let stations: Vec<String> = result.0.into_iter().map(|item| item.stop_name).collect();
 
-        let matches = pattern::Atom::new(
+        let matches = pattern::Pattern::new(
             search,
             pattern::CaseMatching::Ignore,
             pattern::Normalization::Smart,
             pattern::AtomKind::Fuzzy,
-            false,
         )
         .match_list(&stations, &mut self.matcher);
 
