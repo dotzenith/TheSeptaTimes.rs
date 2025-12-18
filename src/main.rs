@@ -7,6 +7,7 @@ use crate::septa::{Arrivals, NextToArrive, TrainSchedule};
 use crate::septum::{ScheduleDirection, ScheduleMode, ScheduleOuter, SeptumMisc};
 use crate::stations::StationsManager;
 use crate::traits::{PrettyPrint, PrettyPrintWithMode};
+use anyhow::{Context, Result, anyhow};
 use clap::{Parser, Subcommand};
 
 pub const URL: &str = "https://www3.septa.org/api";
@@ -110,57 +111,43 @@ enum ExtraCommands {
     },
 }
 
-fn main() {
+fn main() -> Result<()> {
     let mut stations = StationsManager::new();
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::Next { from, to, count } => match (stations.fuzzy_search(&from), stations.fuzzy_search(&to)) {
-            (Err(_), _) | (_, Err(_)) => {
-                eprintln!("Invalid station, please use `tst stations` for all valid station names");
-                std::process::exit(1)
-            }
-            (Ok(matching_start), Ok(matching_end)) => match NextToArrive::get(&matching_start, &matching_end, count) {
-                Ok(next) => next.print(),
-                Err(err) => {
-                    eprintln!("An error occurred while getting next trains: {:?}", err);
-                    std::process::exit(1)
-                }
-            },
-        },
-        Commands::Arrivals { station, count } => match stations.fuzzy_search(&station) {
-            Ok(matching_station) => match Arrivals::get(&matching_station, count) {
-                Ok(arr) => arr.print(),
-                Err(err) => {
-                    eprintln!("An error occurred while getting arrivals: {:?}", err);
-                    std::process::exit(1)
-                }
-            },
-            Err(_) => {
-                eprintln!("Invalid station, please use `tst stations` for all valid station names");
-                std::process::exit(1)
-            }
-        },
-        Commands::Train { number } => match TrainSchedule::get(&number) {
-            Ok(train) => train.print(),
-            Err(err) => {
-                eprintln!("An error occurred while getting train schedule: {:?}", err);
-                std::process::exit(1)
-            }
-        },
+        Commands::Next { from, to, count } => {
+            let matching_from = stations
+                .fuzzy_search(&from)
+                .context("Invalid station, please use `tst stations` for all valid station names")?;
+            let matching_to = stations
+                .fuzzy_search(&to)
+                .context("Invalid station, please use `tst stations` for all valid station names")?;
+            let result = NextToArrive::get(&matching_from, &matching_to, count)
+                .map_err(|e| anyhow!("An error occurred while getting next trains: {:?}", e))?;
+            result.print();
+        }
+        Commands::Arrivals { station, count } => {
+            let matching_station = stations
+                .fuzzy_search(&station)
+                .context("Invalid station, please use `tst stations` for all valid station names")?;
+            let result = Arrivals::get(&matching_station, count)
+                .map_err(|e| anyhow!("An error occurred while getting arrivals: {:?}", e))?;
+            result.print();
+        }
+        Commands::Train { number } => {
+            let result = TrainSchedule::get(&number)
+                .map_err(|e| anyhow!("An error occurred while getting train schedule: {:?}", e))?;
+
+            result.print();
+        }
         Commands::Stations => {
             for station in stations.get_stations().iter() {
                 println!("{station}");
             }
         }
         Commands::Extra { command } => {
-            let mut manager = match SeptumMisc::new() {
-                Ok(man) => man,
-                Err(err) => {
-                    eprintln!("{err}");
-                    std::process::exit(1)
-                }
-            };
+            let mut manager = SeptumMisc::new()?;
 
             match command {
                 ExtraCommands::Schedule {
@@ -172,80 +159,53 @@ fn main() {
                     weekday,
                     weekend,
                 } => {
-                    let direction = if inbound {
-                        ScheduleDirection::Inbound
-                    } else if outbound {
-                        ScheduleDirection::Outbound
-                    } else {
-                        ScheduleDirection::Inbound
+                    let direction = match (inbound, outbound) {
+                        (true, _) => ScheduleDirection::Inbound,
+                        (_, true) => ScheduleDirection::Outbound,
+                        (_, _) => ScheduleDirection::Inbound,
                     };
 
-                    let mode = if weekday {
-                        ScheduleMode::Weekday
-                    } else if weekend {
-                        ScheduleMode::Weekend
-                    } else {
-                        ScheduleMode::Weekday
+                    let mode = match (weekday, weekend) {
+                        (true, _) => ScheduleMode::Weekday,
+                        (_, true) => ScheduleMode::Weekend,
+                        (_, _) => ScheduleMode::Weekday,
                     };
 
-                    match (
-                        manager.fuzzy_match_station_for_line(&line, &orig, &direction),
-                        manager.fuzzy_match_station_for_line(&line, &dest, &direction),
-                    ) {
-                        (Err(_), _) | (_, Err(_)) => {
-                            eprintln!(
-                                "Invalid station, please use `tst extra stations [LINE]` for all valid station names for a given line"
-                            );
-                            std::process::exit(1)
-                        }
-                        (Ok(matching_orig), Ok(matching_dest)) => {
-                            match ScheduleOuter::get(&line, &direction, &matching_orig, &matching_dest) {
-                                Ok(schedule) => schedule.print(&mode),
-                                Err(_) => {
-                                    eprintln!(
-                                        "An error occurred while getting train schedule, please check your inputs"
-                                    );
-                                    std::process::exit(1)
-                                }
-                            }
-                        }
-                    }
+                    let matching_orig = manager
+                        .fuzzy_match_station_for_line(&line, &orig, &direction)
+                        .context("Invalid station, please use `tst extra stations [LINE]` for all valid station names for a given line")?;
+                    let matching_dest = manager
+                        .fuzzy_match_station_for_line(&line, &dest, &direction)
+                        .context("Invalid station, please use `tst extra stations [LINE]` for all valid station names for a given line")?;
+                    let result = ScheduleOuter::get(&line, &direction, &matching_orig, &matching_dest)
+                        .context("An error occurred while getting train schedule, please check your inputs")?;
+                    result.print(&mode);
                 }
-                ExtraCommands::Lines => match manager.get_lines() {
-                    Ok(lines) => lines.print(),
-                    Err(_) => {
-                        eprintln!("An error occurred while getting lines, please check your Septum URL");
-                        std::process::exit(1)
-                    }
-                },
+                ExtraCommands::Lines => {
+                    let result = manager
+                        .get_lines()
+                        .context("An error occurred while getting lines, please check your Septum URL")?;
+                    result.print();
+                }
                 ExtraCommands::Stations {
                     line,
                     inbound,
                     outbound,
                 } => {
-                    let direction = if inbound {
-                        ScheduleDirection::Inbound
-                    } else if outbound {
-                        ScheduleDirection::Outbound
-                    } else {
-                        ScheduleDirection::Inbound
+                    let direction = match (inbound, outbound) {
+                        (true, _) => ScheduleDirection::Inbound,
+                        (_, true) => ScheduleDirection::Outbound,
+                        (_, _) => ScheduleDirection::Inbound,
                     };
-
-                    match manager.get_stations_for_line(&line, &direction) {
-                        Ok(stations) => {
-                            for station in stations.iter() {
-                                println!("{station}");
-                            }
-                        }
-                        Err(_) => {
-                            eprintln!(
-                                "An error occurred while getting station, please check your Septum URL and inputs"
-                            );
-                            std::process::exit(1)
-                        }
+                    let stations = manager
+                        .get_stations_for_line(&line, &direction)
+                        .context("An error occurred while getting station, please check your Septum URL and inputs")?;
+                    for station in stations.iter() {
+                        println!("{station}");
                     }
                 }
             }
         }
     }
+    Ok(())
 }
