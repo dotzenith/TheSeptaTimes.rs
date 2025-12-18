@@ -132,7 +132,7 @@ tst extra stations TRE          # On the Trenton line
 #### Get train schedule going from one station to another on a given line
 > This command also uses fuzzy matching so station names do not need to be exact
 ```sh
-tst extra schedule TRE "Trenton" "Gray 30th Street"
+tst extra schedule TRE "Trenton" "30th St"
 ```
 > By default, this will show inbound trains on weekdays. Use `--inbound/outbound` and `--weekday/weekend`
 to get the schedule you'd like

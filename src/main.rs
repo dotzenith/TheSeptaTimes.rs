@@ -178,7 +178,7 @@ fn main() -> Result<()> {
                         .fuzzy_match_station_for_line(&line, &dest, &direction)
                         .context("Invalid station, please use `tst extra stations [LINE]` for all valid station names for a given line")?;
                     let result = ScheduleOuter::get(&line, &direction, &matching_orig, &matching_dest)
-                        .context("An error occurred while getting train schedule, please check your inputs")?;
+                        .context("An error occurred while getting train schedule, please double check the direction")?;
                     result.print(&mode);
                 }
                 ExtraCommands::Lines => {
