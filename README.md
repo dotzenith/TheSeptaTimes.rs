@@ -141,7 +141,7 @@ to get the schedule you'd like
 
 ## ❖ What's New? 
 
-0.11.0 - Cleaner interface for `tst extra schedule`
+0.11.1 - Better error handling and reporting
 
 ---
 
