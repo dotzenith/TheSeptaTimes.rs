@@ -1,9 +1,9 @@
 use super::ScheduleDirection;
 use crate::traits::{Parse, PrettyPrint};
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context, Result};
 use colored::Colorize;
-use nucleo_matcher::{Config, Matcher, pattern};
 use serde::Deserialize;
+use skimple::SkimpleMatcher;
 use std::env;
 use url::Url;
 
@@ -47,7 +47,7 @@ pub struct LineStations(pub Vec<LinesStationsInner>);
 
 pub struct SeptumMisc {
     url: String,
-    matcher: Matcher,
+    matcher: SkimpleMatcher,
 }
 
 impl SeptumMisc {
@@ -56,7 +56,7 @@ impl SeptumMisc {
 
         Ok(SeptumMisc {
             url: base_url,
-            matcher: Matcher::new(Config::DEFAULT),
+            matcher: SkimpleMatcher::default(),
         })
     }
 
@@ -92,19 +92,7 @@ impl SeptumMisc {
         let result: LineStations = ureq::get(request_url.as_ref()).call()?.body_mut().read_json()?;
         let stations: Vec<String> = result.0.into_iter().map(|item| item.stop_name).collect();
 
-        let matches = pattern::Pattern::new(
-            search,
-            pattern::CaseMatching::Ignore,
-            pattern::Normalization::Smart,
-            pattern::AtomKind::Fuzzy,
-        )
-        .match_list(&stations, &mut self.matcher);
-
-        if matches.len() == 0 {
-            return Err(anyhow!("No matching value"));
-        }
-
-        let station = matches[0].0.to_owned();
+        let station = self.matcher.fuzzy(&stations, search)?.to_owned();
 
         Ok(station)
     }

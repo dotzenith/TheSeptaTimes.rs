@@ -1,8 +1,8 @@
 use anyhow::{Context, Result, anyhow};
 use bincode::{deserialize_from, serialize_into};
 use directories::ProjectDirs;
-use nucleo_matcher::{Config, Matcher, pattern};
 use serde::Deserialize;
+use skimple::SkimpleMatcher;
 use std::env;
 use std::fs;
 use std::fs::{OpenOptions, create_dir_all};
@@ -11,7 +11,7 @@ use std::time::SystemTime;
 
 pub struct StationsManager {
     stations: Vec<String>,
-    matcher: Matcher,
+    matcher: SkimpleMatcher,
 }
 
 #[allow(dead_code)]
@@ -28,7 +28,7 @@ impl StationsManager {
     pub fn new() -> Self {
         let mut manager = StationsManager {
             stations: Vec::new(),
-            matcher: Matcher::new(Config::DEFAULT),
+            matcher: SkimpleMatcher::default(),
         };
         manager.stations = match Self::get_stations_from_file_or_api() {
             Ok(stations) => stations,
@@ -42,26 +42,14 @@ impl StationsManager {
     }
 
     pub fn fuzzy_search(&mut self, search: &str) -> Result<String> {
-        let matches = pattern::Pattern::new(
-            search,
-            pattern::CaseMatching::Ignore,
-            pattern::Normalization::Smart,
-            pattern::AtomKind::Fuzzy,
-        )
-        .match_list(&self.stations, &mut self.matcher);
-
-        if matches.len() == 0 {
-            return Err(anyhow!("No matching value"));
-        }
-
-        let mut station = matches[0].0.to_owned();
+        let mut station = self.matcher.fuzzy(&self.stations, search)?;
 
         match station.split_once('(') {
-            Some((first, _)) => station = first.trim().to_owned(),
+            Some((first, _)) => station = first.trim(),
             None => (),
         }
 
-        Ok(station)
+        Ok(station.into())
     }
 
     fn get_stations_from_file_or_api() -> Result<Vec<String>> {
