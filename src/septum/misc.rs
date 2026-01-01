@@ -92,7 +92,7 @@ impl SeptumMisc {
         let result: LineStations = ureq::get(request_url.as_ref()).call()?.body_mut().read_json()?;
         let stations: Vec<String> = result.0.into_iter().map(|item| item.stop_name).collect();
 
-        let station = self.matcher.fuzzy(&stations, search)?.to_owned();
+        let station = self.matcher.fuzzy_best(&stations, search)?.to_owned();
 
         Ok(station)
     }

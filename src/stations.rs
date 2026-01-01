@@ -42,7 +42,7 @@ impl StationsManager {
     }
 
     pub fn fuzzy_search(&mut self, search: &str) -> Result<String> {
-        let mut station = self.matcher.fuzzy(&self.stations, search)?;
+        let mut station = self.matcher.fuzzy_best(&self.stations, search)?;
 
         match station.split_once('(') {
             Some((first, _)) => station = first.trim(),

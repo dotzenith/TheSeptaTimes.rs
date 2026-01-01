@@ -141,7 +141,7 @@ to get the schedule you'd like
 
 ## ❖ What's New? 
 
-0.11.3 - Yet another attempt at better error handling
+0.11.4 - Yet another attempt at better error handling
 
 ---
 
