@@ -1,23 +1,5 @@
 <h1 align="center"> ━━━━  ❖  ━━━━ </h1>
 
-<!-- BADGES -->
-<div align="center">
-   <p></p>
-   
-   <img src="https://img.shields.io/github/stars/dotzenith/TheSeptaTimes.rs?color=F8BD96&labelColor=302D41&style=for-the-badge">   
-
-   <img src="https://img.shields.io/github/forks/dotzenith/TheSeptaTimes.rs?color=DDB6F2&labelColor=302D41&style=for-the-badge">   
-
-   <img src="https://img.shields.io/github/repo-size/dotzenith/TheSeptaTimes.rs?color=ABE9B3&labelColor=302D41&style=for-the-badge">
-   
-   <img src="https://img.shields.io/github/commit-activity/y/dotzenith/TheSeptaTimes.rs?color=96CDFB&labelColor=302D41&style=for-the-badge&label=COMMITS"/>
-   <br>
-</div>
-
-<p/>
-
----
-
 ## ❖ TheSeptaTimes.rs
 
 TheSeptaTimes.rs is an easy-to-use commandline utility to fetch information about regional SEPTA trains
