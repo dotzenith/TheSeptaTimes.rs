@@ -10,6 +10,7 @@ use crate::stations::StationsManager;
 use crate::traits::{PrettyPrint, PrettyPrintWithMode};
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
+use colored::Colorize;
 
 pub const URL: &str = "https://www3.septa.org/api";
 
@@ -112,7 +113,14 @@ enum ExtraCommands {
     },
 }
 
-fn main() -> Result<()> {
+fn main() {
+    if let Err(e) = run() {
+        eprintln!("{} {}", "error:".red().bold(), e);
+        std::process::exit(1);
+    }
+}
+
+fn run() -> Result<()> {
     let mut stations = StationsManager::new();
     let cli = Cli::parse();
 
