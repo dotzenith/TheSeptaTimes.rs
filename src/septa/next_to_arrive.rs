@@ -40,38 +40,34 @@ impl Parse for NextToArrive {
         self.0
             .iter()
             .map(|train| {
-                if train.isdirect.as_ref().map_or("false", |orig| orig.as_str()) == "true" {
+                if train.isdirect.as_deref().unwrap_or("false") == "true" {
                     format!(
                         "{:<11}{:<13}{:<11}{:<9}{}",
-                        train.orig_train.as_ref().map_or("None", |orig| orig.as_str()),
-                        train.orig_departure_time.as_ref().map_or("None", |orig| orig.as_str()),
-                        train.orig_arrival_time.as_ref().map_or("None", |orig| orig.as_str()),
-                        train.orig_delay.as_ref().map_or("None", |orig| orig.as_str()),
-                        train.orig_line.as_ref().map_or("None", |orig| orig.as_str())
+                        train.orig_train.as_deref().unwrap_or("None"),
+                        train.orig_departure_time.as_deref().unwrap_or("None"),
+                        train.orig_arrival_time.as_deref().unwrap_or("None"),
+                        train.orig_delay.as_deref().unwrap_or("None"),
+                        train.orig_line.as_deref().unwrap_or("None")
                     )
                 } else {
                     let first = format!(
                         "{:<11}{:<13}{:<11}{:<9}{}",
-                        train.orig_train.as_ref().map_or("None", |orig| orig.as_str()),
-                        train.orig_departure_time.as_ref().map_or("None", |orig| orig.as_str()),
-                        train.orig_arrival_time.as_ref().map_or("None", |orig| orig.as_str()),
-                        train.orig_delay.as_ref().map_or("None", |orig| orig.as_str()),
-                        train.orig_line.as_ref().map_or("None", |orig| orig.as_str())
+                        train.orig_train.as_deref().unwrap_or("None"),
+                        train.orig_departure_time.as_deref().unwrap_or("None"),
+                        train.orig_arrival_time.as_deref().unwrap_or("None"),
+                        train.orig_delay.as_deref().unwrap_or("None"),
+                        train.orig_line.as_deref().unwrap_or("None")
                     );
 
-                    let connection = format!(
-                        "Connection: {}",
-                        train.connection.as_ref().map_or("None", |orig| orig.as_str())
-                    )
-                    .blue();
+                    let connection = format!("Connection: {}", train.connection.as_deref().unwrap_or("None")).blue();
 
                     let second = format!(
                         "{:<11}{:<13}{:<11}{:<9}{}",
-                        train.term_train.as_ref().map_or("None", |orig| orig.as_str()),
-                        train.term_depart_time.as_ref().map_or("None", |orig| orig.as_str()),
-                        train.term_arrival_time.as_ref().map_or("None", |orig| orig.as_str()),
-                        train.term_delay.as_ref().map_or("None", |orig| orig.as_str()),
-                        train.term_line.as_ref().map_or("None", |orig| orig.as_str())
+                        train.term_train.as_deref().unwrap_or("None"),
+                        train.term_depart_time.as_deref().unwrap_or("None"),
+                        train.term_arrival_time.as_deref().unwrap_or("None"),
+                        train.term_delay.as_deref().unwrap_or("None"),
+                        train.term_line.as_deref().unwrap_or("None")
                     );
                     format!("{}\n{:^width$}\n{}\n", first, connection, second, width = first.len())
                 }
@@ -81,7 +77,7 @@ impl Parse for NextToArrive {
 }
 
 impl PrettyPrint for NextToArrive {
-    fn print(&self) -> () {
+    fn print(&self) {
         println!(
             "{:<11}{:<13}{:<11}{:<9}{}",
             "Train #".cyan(),

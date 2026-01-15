@@ -24,6 +24,12 @@ pub struct StationsInner {
 #[derive(Deserialize, Debug)]
 pub struct Stations(pub Vec<StationsInner>);
 
+impl Default for StationsManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl StationsManager {
     pub fn new() -> Self {
         let mut manager = StationsManager {
@@ -37,16 +43,15 @@ impl StationsManager {
         manager
     }
 
-    pub fn get_stations(&self) -> &Vec<String> {
+    pub fn get_stations(&self) -> &[String] {
         &self.stations
     }
 
     pub fn fuzzy_search(&mut self, search: &str) -> Result<String> {
         let mut station = self.matcher.fuzzy_best(&self.stations, search)?;
 
-        match station.split_once('(') {
-            Some((first, _)) => station = first.trim(),
-            None => (),
+        if let Some((first, _)) = station.split_once('(') {
+            station = first.trim();
         }
 
         Ok(station.into())
@@ -83,7 +88,7 @@ impl StationsManager {
         Ok(stations)
     }
 
-    fn save_stations_to_file(stations: &Vec<String>) -> Result<()> {
+    fn save_stations_to_file(stations: &[String]) -> Result<()> {
         let app_dir = ProjectDirs::from("com", "dotzenith", "TheSeptaTimes").ok_or(anyhow!("Unable to get AppDirs"))?;
         if !app_dir.cache_dir().exists() {
             create_dir_all(&app_dir.cache_dir())?;

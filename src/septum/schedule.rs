@@ -1,5 +1,6 @@
 use crate::traits::{ParseWithMode, PrettyPrintWithMode};
-use anyhow::Result as AnyResult;
+use crate::utils::parse_time;
+use anyhow::{Context, Result as AnyResult};
 use colored::Colorize;
 use serde::Deserialize;
 use std::env;
@@ -57,24 +58,18 @@ impl FromStr for ScheduleDirection {
     }
 }
 
-impl ToString for ScheduleDirection {
-    fn to_string(&self) -> String {
+impl std::fmt::Display for ScheduleDirection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ScheduleDirection::Inbound => "inbound".to_string(),
-            ScheduleDirection::Outbound => "outbound".to_string(),
+            ScheduleDirection::Inbound => write!(f, "inbound"),
+            ScheduleDirection::Outbound => write!(f, "outbound"),
         }
     }
 }
 
 impl ScheduleOuter {
     pub fn get(line: &str, direction: &ScheduleDirection, orig: &str, dest: &str) -> AnyResult<ScheduleOuter> {
-        let base_url = match env::var("SeptumURL") {
-            Ok(url) => url,
-            Err(_) => {
-                eprintln!("SeptumURL unset, cannot use this endpoint otherwise");
-                std::process::exit(1)
-            }
-        };
+        let base_url = env::var("SeptumURL").context("SeptumURL not set. Set it with: export SeptumURL=https://...")?;
         let request_url = Url::parse(&format!(
             "{}/schedule?line={}&direction={}&orig={}&dest={}",
             base_url,
@@ -131,34 +126,4 @@ impl PrettyPrintWithMode for ScheduleOuter {
             println!("{train}");
         }
     }
-}
-
-fn parse_time(time: &str) -> String {
-    let time_vec: Vec<&str> = time.split(":").collect();
-    let mut hour = time_vec[0].parse::<u8>().unwrap_or(0);
-    let minute = time_vec[1].parse::<u8>().unwrap_or(0);
-    let mut meridian = "AM";
-
-    // Look, this time handling was super crude to begin with
-    // But septa also believes there are more than 24 hours in
-    // a day, so here we are
-    match hour {
-        12 => {
-            meridian = "PM";
-        }
-        13..=23 => {
-            meridian = "PM";
-            hour -= 12;
-        }
-        24 => {
-            meridian = "AM";
-            hour -= 12;
-        }
-        25..36 => {
-            meridian = "AM";
-            hour -= 24;
-        }
-        _ => (),
-    }
-    format!("{:02}:{:02} {}", hour, minute, meridian)
 }

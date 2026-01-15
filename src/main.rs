@@ -2,13 +2,15 @@ mod septa;
 mod septum;
 mod stations;
 mod traits;
+mod utils;
 
 use crate::septa::{Arrivals, NextToArrive, TrainSchedule};
 use crate::septum::{ScheduleDirection, ScheduleMode, ScheduleOuter, SeptumMisc};
 use crate::stations::StationsManager;
 use crate::traits::{PrettyPrint, PrettyPrintWithMode};
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
+use colored::Colorize;
 
 pub const URL: &str = "https://www3.septa.org/api";
 
@@ -111,7 +113,14 @@ enum ExtraCommands {
     },
 }
 
-fn main() -> Result<()> {
+fn main() {
+    if let Err(e) = run() {
+        eprintln!("{} {}", "error:".red().bold(), e);
+        std::process::exit(1);
+    }
+}
+
+fn run() -> Result<()> {
     let mut stations = StationsManager::new();
     let cli = Cli::parse();
 
@@ -123,21 +132,18 @@ fn main() -> Result<()> {
             let matching_to = stations
                 .fuzzy_search(&to)
                 .context("Invalid station, please use `tst stations` for all valid station names")?;
-            let result = NextToArrive::get(&matching_from, &matching_to, count)
-                .map_err(|e| anyhow!("An error occurred while getting next trains: {:?}", e))?;
+            let result = NextToArrive::get(&matching_from, &matching_to, count).context("Failed to get next trains")?;
             result.print();
         }
         Commands::Arrivals { station, count } => {
             let matching_station = stations
                 .fuzzy_search(&station)
                 .context("Invalid station, please use `tst stations` for all valid station names")?;
-            let result = Arrivals::get(&matching_station, count)
-                .map_err(|e| anyhow!("An error occurred while getting arrivals: {:?}", e))?;
+            let result = Arrivals::get(&matching_station, count).context("Failed to get arrivals")?;
             result.print();
         }
         Commands::Train { number } => {
-            let result = TrainSchedule::get(&number)
-                .map_err(|e| anyhow!("An error occurred while getting train schedule: {:?}", e))?;
+            let result = TrainSchedule::get(&number).context("Failed to get train schedule")?;
 
             result.print();
         }

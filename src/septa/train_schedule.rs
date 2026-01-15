@@ -32,9 +32,9 @@ impl Parse for TrainSchedule {
             .map(|train| {
                 format!(
                     "{:<27}{:<18}{}",
-                    train.station.as_ref().map_or("None", |orig| orig.as_str()),
-                    train.sched_tm.as_ref().map_or("None", |orig| orig.as_str()),
-                    train.act_tm.as_ref().map_or("None", |orig| orig.as_str())
+                    train.station.as_deref().unwrap_or("None"),
+                    train.sched_tm.as_deref().unwrap_or("None"),
+                    train.act_tm.as_deref().unwrap_or("None")
                 )
             })
             .collect()
