@@ -77,7 +77,7 @@ impl Parse for NextToArrive {
 }
 
 impl PrettyPrint for NextToArrive {
-    fn print(&self) -> () {
+    fn print(&self) {
         println!(
             "{:<11}{:<13}{:<11}{:<9}{}",
             "Train #".cyan(),

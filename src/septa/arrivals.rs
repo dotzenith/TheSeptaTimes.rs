@@ -1,81 +1,78 @@
 use crate::URL;
 use crate::traits::{Parse, PrettyPrint};
 use crate::utils::parse_datetime;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use colored::Colorize;
 use serde::Deserialize;
 use std::collections::HashMap;
 use url::Url;
 
-#[allow(dead_code)]
-#[derive(Deserialize)]
-pub struct ArrivalsInner {
-    direction: Option<String>,
-    path: Option<String>,
+#[derive(Deserialize, Clone)]
+pub struct Train {
     train_id: Option<String>,
-    origin: Option<String>,
     destination: Option<String>,
-    line: Option<String>,
     status: Option<String>,
-    service_type: Option<String>,
     next_station: Option<String>,
     sched_time: Option<String>,
-    depart_time: Option<String>,
-    track: Option<String>,
-    track_change: Option<String>,
-    platform: Option<String>,
-    platform_change: Option<String>,
 }
 
+/// Intermediate structure matching the SEPTA API response format.
+/// The API returns: `{ "station_name": [{"Northbound": [...]}, {"Southbound": [...]}] }`
 #[derive(Deserialize)]
-pub struct Arrivals(pub HashMap<String, Vec<HashMap<String, Vec<ArrivalsInner>>>>);
+struct ApiResponse(HashMap<String, Vec<HashMap<String, Vec<Train>>>>);
+
+/// Cleaned up arrivals data with northbound and southbound trains.
+pub struct Arrivals {
+    pub northbound: Vec<Train>,
+    pub southbound: Vec<Train>,
+}
 
 impl Arrivals {
     pub fn get(name: &str, num: u8) -> Result<Arrivals> {
         let request_url = Url::parse(&format!("{}/Arrivals/index.php?station={}&results={}", URL, name, num))?;
-        let result: Arrivals = ureq::get(request_url.as_ref()).call()?.body_mut().read_json()?;
-        Ok(result)
+
+        let response: ApiResponse = ureq::get(request_url.as_ref()).call()?.body_mut().read_json()?;
+
+        Self::from_response(response)
+    }
+
+    fn from_response(response: ApiResponse) -> Result<Arrivals> {
+        let directions = response.0.into_values().next().context("Empty response from API")?;
+
+        let mut northbound = Vec::new();
+        let mut southbound = Vec::new();
+
+        for direction_map in directions {
+            if let Some(trains) = direction_map.get("Northbound") {
+                northbound.extend(trains.iter().cloned());
+            }
+            if let Some(trains) = direction_map.get("Southbound") {
+                southbound.extend(trains.iter().cloned());
+            }
+        }
+
+        Ok(Arrivals { northbound, southbound })
     }
 }
 
 impl Parse for Arrivals {
     fn parse(&self) -> Vec<String> {
-        let vec = self.0.values().next().unwrap();
-        let north = &vec[0]["Northbound"];
-        let south = &vec[1]["Southbound"];
+        let format_train = |direction: &str, train: &Train| {
+            format!(
+                "{:<13}{:<11}{:<27}{:<12}{:<10}{}",
+                direction,
+                train.train_id.as_deref().unwrap_or("None"),
+                train.next_station.as_deref().unwrap_or("None"),
+                parse_datetime(train.sched_time.as_deref()),
+                train.status.as_deref().unwrap_or("None"),
+                train.destination.as_deref().unwrap_or("None")
+            )
+        };
 
-        let mut trains: Vec<String> = north
-            .into_iter()
-            .map(|train| {
-                format!(
-                    "{:<13}{:<11}{:<27}{:<12}{:<10}{}",
-                    "North",
-                    train.train_id.as_deref().unwrap_or("None"),
-                    train.next_station.as_deref().unwrap_or("None"),
-                    parse_datetime(train.sched_time.as_deref()),
-                    train.status.as_deref().unwrap_or("None"),
-                    train.destination.as_deref().unwrap_or("None")
-                )
-            })
-            .collect();
+        let north = self.northbound.iter().map(|t| format_train("North", t));
+        let south = self.southbound.iter().map(|t| format_train("South", t));
 
-        trains.append(
-            &mut south
-                .into_iter()
-                .map(|train| {
-                    format!(
-                        "{:<13}{:<11}{:<27}{:<12}{:<10}{}",
-                        "South",
-                        train.train_id.as_deref().unwrap_or("None"),
-                        train.next_station.as_deref().unwrap_or("None"),
-                        parse_datetime(train.sched_time.as_deref()),
-                        train.status.as_deref().unwrap_or("None"),
-                        train.destination.as_deref().unwrap_or("None")
-                    )
-                })
-                .collect::<Vec<String>>(),
-        );
-        trains
+        north.chain(south).collect()
     }
 }
 
@@ -90,7 +87,7 @@ impl PrettyPrint for Arrivals {
             "Status".red(),
             "Destination".yellow(),
         );
-        for train in self.parse().iter() {
+        for train in self.parse() {
             println!("{train}");
         }
     }

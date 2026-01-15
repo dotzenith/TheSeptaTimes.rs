@@ -1,6 +1,6 @@
 use crate::traits::{ParseWithMode, PrettyPrintWithMode};
 use crate::utils::parse_time;
-use anyhow::Result as AnyResult;
+use anyhow::{Context, Result as AnyResult};
 use colored::Colorize;
 use serde::Deserialize;
 use std::env;
@@ -58,24 +58,18 @@ impl FromStr for ScheduleDirection {
     }
 }
 
-impl ToString for ScheduleDirection {
-    fn to_string(&self) -> String {
+impl std::fmt::Display for ScheduleDirection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ScheduleDirection::Inbound => "inbound".to_string(),
-            ScheduleDirection::Outbound => "outbound".to_string(),
+            ScheduleDirection::Inbound => write!(f, "inbound"),
+            ScheduleDirection::Outbound => write!(f, "outbound"),
         }
     }
 }
 
 impl ScheduleOuter {
     pub fn get(line: &str, direction: &ScheduleDirection, orig: &str, dest: &str) -> AnyResult<ScheduleOuter> {
-        let base_url = match env::var("SeptumURL") {
-            Ok(url) => url,
-            Err(_) => {
-                eprintln!("SeptumURL unset, cannot use this endpoint otherwise");
-                std::process::exit(1)
-            }
-        };
+        let base_url = env::var("SeptumURL").context("SeptumURL not set. Set it with: export SeptumURL=https://...")?;
         let request_url = Url::parse(&format!(
             "{}/schedule?line={}&direction={}&orig={}&dest={}",
             base_url,
