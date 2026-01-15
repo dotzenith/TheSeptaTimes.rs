@@ -83,11 +83,11 @@ impl Parse for Arrivals {
                 format!(
                     "{:<13}{:<11}{:<27}{:<12}{:<10}{}",
                     "North",
-                    train.train_id.as_ref().map_or("None", |orig| orig.as_str()),
-                    train.next_station.as_ref().map_or("None", |orig| orig.as_str()),
-                    parse_time(train.sched_time.as_ref().map(|s| s.as_str())),
-                    train.status.as_ref().map_or("None", |orig| orig.as_str()),
-                    train.destination.as_ref().map_or("None", |orig| orig.as_str())
+                    train.train_id.as_deref().unwrap_or("None"),
+                    train.next_station.as_deref().unwrap_or("None"),
+                    parse_time(train.sched_time.as_deref()),
+                    train.status.as_deref().unwrap_or("None"),
+                    train.destination.as_deref().unwrap_or("None")
                 )
             })
             .collect();
@@ -99,11 +99,11 @@ impl Parse for Arrivals {
                     format!(
                         "{:<13}{:<11}{:<27}{:<12}{:<10}{}",
                         "South",
-                        train.train_id.as_ref().map_or("None", |orig| orig.as_str()),
-                        train.next_station.as_ref().map_or("None", |orig| orig.as_str()),
-                        parse_time(train.sched_time.as_ref().map(|s| s.as_str())),
-                        train.status.as_ref().map_or("None", |orig| orig.as_str()),
-                        train.destination.as_ref().map_or("None", |orig| orig.as_str())
+                        train.train_id.as_deref().unwrap_or("None"),
+                        train.next_station.as_deref().unwrap_or("None"),
+                        parse_time(train.sched_time.as_deref()),
+                        train.status.as_deref().unwrap_or("None"),
+                        train.destination.as_deref().unwrap_or("None")
                     )
                 })
                 .collect::<Vec<String>>(),
