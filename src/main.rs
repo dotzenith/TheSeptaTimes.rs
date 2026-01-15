@@ -2,6 +2,7 @@ mod septa;
 mod septum;
 mod stations;
 mod traits;
+mod utils;
 
 use crate::septa::{Arrivals, NextToArrive, TrainSchedule};
 use crate::septum::{ScheduleDirection, ScheduleMode, ScheduleOuter, SeptumMisc};

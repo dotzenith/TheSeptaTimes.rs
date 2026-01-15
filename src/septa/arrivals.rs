@@ -1,5 +1,6 @@
 use crate::URL;
 use crate::traits::{Parse, PrettyPrint};
+use crate::utils::parse_datetime;
 use anyhow::Result;
 use colored::Colorize;
 use serde::Deserialize;
@@ -37,40 +38,6 @@ impl Arrivals {
     }
 }
 
-pub fn parse_time(time: Option<&str>) -> String {
-    if time.is_none() {
-        return "None".to_owned();
-    }
-
-    let time_vec: Vec<&str> = time.unwrap().split(" ").collect::<Vec<&str>>()[1].split(":").collect();
-    let mut hour = time_vec[0].parse::<u8>().unwrap_or(0);
-    let minute = time_vec[1].parse::<u8>().unwrap_or(0);
-    let mut meridian = "AM";
-
-    // Look, this time handling was super crude to begin with
-    // But septa also believes there are more than 24 hours in
-    // a day, so here we are
-    match hour {
-        12 => {
-            meridian = "PM";
-        }
-        13..=23 => {
-            meridian = "PM";
-            hour -= 12;
-        }
-        24 => {
-            meridian = "AM";
-            hour -= 12;
-        }
-        25..36 => {
-            meridian = "AM";
-            hour -= 24;
-        }
-        _ => (),
-    }
-    format!("{:02}:{:02} {}", hour, minute, meridian)
-}
-
 impl Parse for Arrivals {
     fn parse(&self) -> Vec<String> {
         let vec = self.0.values().next().unwrap();
@@ -85,7 +52,7 @@ impl Parse for Arrivals {
                     "North",
                     train.train_id.as_deref().unwrap_or("None"),
                     train.next_station.as_deref().unwrap_or("None"),
-                    parse_time(train.sched_time.as_deref()),
+                    parse_datetime(train.sched_time.as_deref()),
                     train.status.as_deref().unwrap_or("None"),
                     train.destination.as_deref().unwrap_or("None")
                 )
@@ -101,7 +68,7 @@ impl Parse for Arrivals {
                         "South",
                         train.train_id.as_deref().unwrap_or("None"),
                         train.next_station.as_deref().unwrap_or("None"),
-                        parse_time(train.sched_time.as_deref()),
+                        parse_datetime(train.sched_time.as_deref()),
                         train.status.as_deref().unwrap_or("None"),
                         train.destination.as_deref().unwrap_or("None")
                     )

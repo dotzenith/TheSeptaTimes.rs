@@ -1,4 +1,5 @@
 use crate::traits::{ParseWithMode, PrettyPrintWithMode};
+use crate::utils::parse_time;
 use anyhow::Result as AnyResult;
 use colored::Colorize;
 use serde::Deserialize;
@@ -131,34 +132,4 @@ impl PrettyPrintWithMode for ScheduleOuter {
             println!("{train}");
         }
     }
-}
-
-fn parse_time(time: &str) -> String {
-    let time_vec: Vec<&str> = time.split(":").collect();
-    let mut hour = time_vec[0].parse::<u8>().unwrap_or(0);
-    let minute = time_vec[1].parse::<u8>().unwrap_or(0);
-    let mut meridian = "AM";
-
-    // Look, this time handling was super crude to begin with
-    // But septa also believes there are more than 24 hours in
-    // a day, so here we are
-    match hour {
-        12 => {
-            meridian = "PM";
-        }
-        13..=23 => {
-            meridian = "PM";
-            hour -= 12;
-        }
-        24 => {
-            meridian = "AM";
-            hour -= 12;
-        }
-        25..36 => {
-            meridian = "AM";
-            hour -= 24;
-        }
-        _ => (),
-    }
-    format!("{:02}:{:02} {}", hour, minute, meridian)
 }
