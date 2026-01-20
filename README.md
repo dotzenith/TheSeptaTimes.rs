@@ -57,7 +57,7 @@ Commands:
   train        Track a given train
   stations     Get all valid station names
   extra        All of the extra endpoints added by Septum
-  completions  Generate shell completions
+  completion   Generate shell completions
   help         Print this message or the help of the given subcommand(s)
 
 Options:
@@ -124,7 +124,7 @@ to get the schedule you'd like
 
 ## ❖ What's New? 
 
-0.12.0 - Add shell completions
+0.12.1 - Add shell completions
 
 ---
 

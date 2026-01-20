@@ -67,7 +67,7 @@ enum Commands {
     },
 
     /// Generate shell completions
-    Completions {
+    Completion {
         /// The shell to generate completions for
         shell: Shell,
     },
@@ -160,7 +160,7 @@ fn run() -> Result<()> {
                 println!("{station}");
             }
         }
-        Commands::Completions { shell } => {
+        Commands::Completion { shell } => {
             let mut cmd = Cli::command();
             generate(shell, &mut cmd, "tst", &mut io::stdout());
         }
