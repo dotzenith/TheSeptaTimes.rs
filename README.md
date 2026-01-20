@@ -52,12 +52,13 @@ A CLI application for the SEPTA API
 Usage: tst <COMMAND>
 
 Commands:
-  next      Search for the next train going from an origin to a destination
-  arrivals  Find the next arrivals at a given train station
-  train     Track a given train
-  stations  Get all valid station names
-  extra     All of the extra endpoints added by Septum
-  help      Print this message or the help of the given subcommand(s)
+  next         Search for the next train going from an origin to a destination
+  arrivals     Find the next arrivals at a given train station
+  train        Track a given train
+  stations     Get all valid station names
+  extra        All of the extra endpoints added by Septum
+  completions  Generate shell completions
+  help         Print this message or the help of the given subcommand(s)
 
 Options:
   -h, --help     Print help
