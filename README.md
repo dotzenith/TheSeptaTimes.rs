@@ -123,7 +123,7 @@ to get the schedule you'd like
 
 ## ❖ What's New? 
 
-0.11.5 - Cleaner error messages
+0.12.0 - Add shell completions
 
 ---
 
