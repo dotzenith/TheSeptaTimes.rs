@@ -29,10 +29,8 @@ jobs:
           fi
 
           # Add the completions line after install_binary_aliases!
-          sed -i '/install_binary_aliases!/a\
-\
-    # Generate and install shell completions\
-    generate_completions_from_executable(bin/"tst", "completions")' "$FORMULA"
+          COMPLETIONS_LINE='    generate_completions_from_executable(bin/"tst", "completions")'
+          sed -i "/install_binary_aliases!/a\\\\\\n    # Generate and install shell completions\\n${COMPLETIONS_LINE}" "$FORMULA"
 
           echo "Patched formula:"
           cat "$FORMULA"
