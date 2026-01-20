@@ -9,8 +9,10 @@ use crate::septum::{ScheduleDirection, ScheduleMode, ScheduleOuter, SeptumMisc};
 use crate::stations::StationsManager;
 use crate::traits::{PrettyPrint, PrettyPrintWithMode};
 use anyhow::{Context, Result};
-use clap::{Parser, Subcommand};
+use clap::{CommandFactory, Parser, Subcommand};
+use clap_complete::{generate, Shell};
 use colored::Colorize;
+use std::io;
 
 pub const URL: &str = "https://www3.septa.org/api";
 
@@ -62,6 +64,12 @@ enum Commands {
     Extra {
         #[command(subcommand)]
         command: ExtraCommands,
+    },
+
+    /// Generate shell completions
+    Completions {
+        /// The shell to generate completions for
+        shell: Shell,
     },
 }
 
@@ -151,6 +159,10 @@ fn run() -> Result<()> {
             for station in stations.get_stations().iter() {
                 println!("{station}");
             }
+        }
+        Commands::Completions { shell } => {
+            let mut cmd = Cli::command();
+            generate(shell, &mut cmd, "tst", &mut io::stdout());
         }
         Commands::Extra { command } => {
             let mut manager = SeptumMisc::new()?;
