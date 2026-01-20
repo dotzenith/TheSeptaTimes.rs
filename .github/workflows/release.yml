@@ -340,3 +340,12 @@ jobs:
         with:
           persist-credentials: false
           submodules: recursive
+
+  custom-patch-homebrew:
+    needs:
+      - plan
+      - announce
+    uses: ./.github/workflows/patch-homebrew.yml
+    with:
+      plan: ${{ needs.plan.outputs.val }}
+    secrets: inherit

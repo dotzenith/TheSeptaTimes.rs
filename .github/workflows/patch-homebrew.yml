@@ -1,0 +1,52 @@
+name: Patch Homebrew Formula
+
+on:
+  workflow_call:
+    inputs:
+      plan:
+        required: true
+        type: string
+
+jobs:
+  patch-homebrew:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout homebrew-tap
+        uses: actions/checkout@v4
+        with:
+          repository: dotzenith/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          persist-credentials: true
+
+      - name: Add shell completions to formula
+        run: |
+          FORMULA="Formula/the-septa-times.rb"
+
+          # Check if completions line already exists
+          if grep -q "generate_completions_from_executable" "$FORMULA"; then
+            echo "Shell completions already configured, skipping"
+            exit 0
+          fi
+
+          # Add the completions line after install_binary_aliases!
+          sed -i '/install_binary_aliases!/a\
+\
+    # Generate and install shell completions\
+    generate_completions_from_executable(bin/"tst", "completions")' "$FORMULA"
+
+          echo "Patched formula:"
+          cat "$FORMULA"
+
+      - name: Commit and push
+        run: |
+          git config --global user.name "axo bot"
+          git config --global user.email "admin+bot@axo.dev"
+
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git add Formula/the-septa-times.rb
+          git commit -m "Add shell completions to the-septa-times"
+          git push
