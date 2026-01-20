@@ -28,9 +28,18 @@ jobs:
             exit 0
           fi
 
-          # Add the completions line after install_binary_aliases!
-          COMPLETIONS_LINE='    generate_completions_from_executable(bin/"tst", "completions")'
-          sed -i "/install_binary_aliases!/a\\\\\\n    # Generate and install shell completions\\n${COMPLETIONS_LINE}" "$FORMULA"
+          # Add the completions line after install_binary_aliases! in the install method
+          # Using awk to insert after the specific line in def install
+          awk '
+            /^  def install$/ { in_install = 1 }
+            /^  end$/ && in_install { in_install = 0 }
+            { print }
+            in_install && /install_binary_aliases!/ {
+              print ""
+              print "    # Generate and install shell completions"
+              print "    generate_completions_from_executable(bin/\"tst\", \"completion\")"
+            }
+          ' "$FORMULA" > "${FORMULA}.tmp" && mv "${FORMULA}.tmp" "$FORMULA"
 
           echo "Patched formula:"
           cat "$FORMULA"
