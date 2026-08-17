@@ -124,7 +124,7 @@ to get the schedule you'd like
 
 ## ❖ What's New? 
 
-0.12.3 - Add shell completions
+0.12.4 - Fix connection string for `tst next`
 
 ---
 

@@ -16,6 +16,7 @@ pub struct NextToArriveInner {
     term_line: Option<String>,
     term_depart_time: Option<String>,
     term_arrival_time: Option<String>,
+    #[serde(rename = "Connection")]
     connection: Option<String>,
     term_delay: Option<String>,
     isdirect: Option<String>,
